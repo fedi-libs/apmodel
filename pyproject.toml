@@ -10,6 +10,8 @@ requires-python = ">=3.10"
 dependencies = [
     "cryptography>=45.0.6",
     "multiformats>=0.3.1.post4",
+    "pydantic>=2.12.3",
+    "pyld[aiohttp,requests]>=2.0.4",
 ]
 license = {text = "MIT"}
 classifiers = [
@@ -26,9 +28,6 @@ classifiers = [
 Repository = "https://github.com/fedi-libs/apmodel"
 Issues = "https://github.com/fedi-libs/apmodel/issues"
 Changelog = "https://github.com/fedi-libs/apmodel/blob/main/CHANGELOG.md"
-
-[project.scripts]
-apmodel = "apmodel:main"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]

@@ -1,27 +1,43 @@
 from dataclasses import fields
 
 from .context import LDContext
-
-from .types import ActivityPubModel
 from .core import (
-    Object,
-    Link,
     Activity,
-    IntransitiveActivity,
     Collection,
-    OrderedCollection,
     CollectionPage,
+    IntransitiveActivity,
+    Link,
+    Object,
+    OrderedCollection,
     OrderedCollectionPage,
 )
-
+from .extra import Emoji, Hashtag
 from .extra.cid import DataIntegrityProof, Multikey
 from .extra.schema import PropertyValue
 from .extra.security import CryptographicKey
-from .extra import Emoji, Hashtag
-
+from .nodeinfo import Nodeinfo
+from .types import ActivityPubModel
+from .vocab import (
+    Application,
+    Article,
+    Audio,
+    Document,
+    Event,
+    Group,
+    Image,
+    Mention,
+    Note,
+    Organization,
+    Page,
+    Person,
+    Place,
+    Profile,
+    Service,
+    Tombstone,
+    Video,
+)
 from .vocab.activity import (
     Accept,
-    TentativeAccept,
     Add,
     Announce,
     Arrive,
@@ -42,33 +58,14 @@ from .vocab.activity import (
     Question,
     Read,
     Reject,
-    TentativeReject,
     Remove,
+    TentativeAccept,
+    TentativeReject,
     Travel,
     Undo,
     Update,
     View,
 )
-from .vocab import (
-    Person,
-    Application,
-    Group,
-    Organization,
-    Service,
-    Article,
-    Document,
-    Audio,
-    Image,
-    Video,
-    Page,
-    Event,
-    Place,
-    Mention,
-    Note,
-    Profile,
-    Tombstone,
-)
-from .nodeinfo import Nodeinfo
 
 _type_map = {
     # Core Types
@@ -132,10 +129,9 @@ _type_map = {
     "Multikey": Multikey,
     # schema.org
     "PropertyValue": PropertyValue,
-
     # Others
     "Emoji": Emoji,
-    "Hashtag": Hashtag
+    "Hashtag": Hashtag,
 }
 
 
@@ -151,7 +147,9 @@ def load(data: dict) -> dict | ActivityPubModel:
                 if isinstance(value, dict):
                     kwargs[key] = load(value)
                 elif isinstance(value, list):
-                    kwargs[key] = [load(v) if isinstance(v, dict) else v for v in value]
+                    kwargs[key] = [
+                        load(v) if isinstance(v, dict) else v for v in value
+                    ]
                 else:
                     kwargs[key] = value
             else:
@@ -161,6 +159,7 @@ def load(data: dict) -> dict | ActivityPubModel:
         if Nodeinfo.is_nodeinfo_data(data):
             return Nodeinfo.from_json(data)
     return load_exact_match(data)
+
 
 def load_exact_match(data: dict) -> dict | ActivityPubModel:
     if {"id", "owner", "publicKeyPem"} <= set(data.keys()):
