@@ -1,33 +1,42 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Union, TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Annotated, Optional, Union
+
+from pydantic import BeforeValidator, Field
 
 from ..context import LDContext
-from ..types import Undefined, ActivityPubModel
-from ..dumper import _serialize_model_to_json
+from ..helpers import get_value_from_array
+from ..types import ActivityPubModel, parse_ld_context
 
 if TYPE_CHECKING:
     from .object import Object
 
-T = TypeVar("T", bound="Link")
 
-@dataclass
 class Link(ActivityPubModel):
-    _context: LDContext = field(default_factory=lambda: LDContext(["https://www.w3.org/ns/activitystreams"]), kw_only=True)
+    context: Annotated[LDContext, BeforeValidator(parse_ld_context)] = Field(
+        alias="@context",
+        kw_only=True,
+        default_factory=lambda: LDContext(
+            ["https://www.w3.org/ns/activitystreams"]
+        ),
+    )
 
-    type: Union[str, Undefined] = field(default="Link", kw_only=True)
-    id: Union[str, "Object", Link, Undefined] = field(default_factory=Undefined, kw_only=True)
-    name: Union[str, Undefined] = field(default_factory=Undefined, kw_only=True)
-    href: Union[str, Undefined] = field(default_factory=Undefined)
-    hreflang: Union[str, Undefined] = field(default_factory=Undefined)
-    mediaType: Union[str, Undefined] = field(default_factory=Undefined)
-    
-    _extra: dict = field(default_factory=dict)
-
-    def __post_init__(self):
-        if self.type is Undefined:
-            self.type = self.__class__.__name__
-
-    def to_json(self):
-        return _serialize_model_to_json(self)
+    type: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
+        Field(default="Link")
+    )
+    id: Annotated[
+        Optional[Union[str, "Object", "Link"]],
+        BeforeValidator(get_value_from_array),
+    ] = Field()
+    name: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
+        Field()
+    )
+    href: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
+        Field()
+    )
+    hreflang: Annotated[
+        Optional[str], BeforeValidator(get_value_from_array)
+    ] = Field()
+    mediaType: Annotated[
+        Optional[str], BeforeValidator(get_value_from_array)
+    ] = Field()

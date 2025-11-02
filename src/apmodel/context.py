@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Union, overload, TypeVar
+from typing import Any, Dict, List, TypeVar, Union, overload
+
+from pydantic_core import core_schema
 
 LDContextType = TypeVar("LDContextType", bound="LDContext")
+
 
 class LDContext:
     """
@@ -13,6 +16,7 @@ class LDContext:
       ones for the same key.
     This provides a list-like interface to the full context.
     """
+
     def __init__(self, context: Any = None):
         self.urls: List[str] = []
         self.definitions: Dict[str, Any] = {}
@@ -83,7 +87,9 @@ class LDContext:
     @overload
     def __getitem__(self, key: slice) -> List[Union[str, Dict[str, Any]]]: ...
 
-    def __getitem__(self, key: Union[int, slice]) -> Union[Union[str, Dict[str, Any]], List[Union[str, Dict[str, Any]]]]:
+    def __getitem__(
+        self, key: Union[int, slice]
+    ) -> Union[Union[str, Dict[str, Any]], List[Union[str, Dict[str, Any]]]]:
         return self.full_context[key]
 
     def __add__(self: LDContextType, other: LDContext) -> LDContextType:
@@ -96,3 +102,28 @@ class LDContext:
         """Merges another LDContext instance into this one."""
         self.add(other.full_context)
         return self
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source_type: Any,
+        handler: Any,
+    ) -> core_schema.CoreSchema:
+        """
+        Defines how Pydantic should handle the LDContext type.
+        """
+        from_any_schema = core_schema.no_info_plain_validator_function(
+            cls
+        )
+
+        to_full_context_serializer = (
+            core_schema.plain_serializer_function_ser_schema(
+                lambda instance: instance.full_context
+            )
+        )
+
+        return core_schema.json_or_python_schema(
+            json_schema=from_any_schema,
+            python_schema=from_any_schema,
+            serialization=to_full_context_serializer,
+        )
