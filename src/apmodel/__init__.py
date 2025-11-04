@@ -1,3 +1,4 @@
+from ._initial import _rebuild  # noqa: F401
 from ._version import __version__, __version_tuple__  # noqa: F401
 
 # from .dumper import dump
@@ -38,11 +39,3 @@ __all__ = [
     # context
     "LDContext",
 ]
-
-Object.model_rebuild()
-Link.model_rebuild()
-Activity.model_rebuild()
-Collection.model_rebuild()
-OrderedCollection.model_rebuild()
-CollectionPage.model_rebuild()
-OrderedCollectionPage.model_rebuild()

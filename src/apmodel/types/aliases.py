@@ -1,9 +1,8 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Optional, Union
+from typing import TYPE_CHECKING, Annotated, Optional, TypeAlias, Union
 
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 from pydantic import AfterValidator, BeforeValidator
-from typing_extensions import TypeAlias
 
 from ..context import LDContext
 from ..helpers import (

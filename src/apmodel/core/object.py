@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated, List, Optional, TypeVar, Union
 
-from pydantic import BeforeValidator, Field
+from pydantic import BeforeValidator, ConfigDict, Field
 
 from apmodel.types.aliases import (
     JSONLD_CONTEXT,
@@ -29,8 +29,13 @@ T = TypeVar("T", bound="Object")
 
 
 class Object(ActivityPubModel):
+    model_config = ConfigDict(
+        serialize_by_alias=True 
+    )
+    
     context: JSONLD_CONTEXT = Field(
-        alias="@context",
+        validation_alias="@context",
+        serialization_alias="@context",
         kw_only=True,
         default_factory=lambda: LDContext(
             ["https://www.w3.org/ns/activitystreams"]
@@ -39,7 +44,7 @@ class Object(ActivityPubModel):
     id: OPT_STR = Field(
         validation_alias="@id", serialization_alias="@id", default=None
     )
-    type: str = Field(
+    type: Annotated[str, BeforeValidator(get_value_from_array)] = Field(
         alias="@type",
         default="https://www.w3.org/ns/activitystreams#Object",
         kw_only=True,
