@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined
 from ...core.activity import Activity
 
-@dataclass
+
 class Dislike(Activity):
-    type: Union[str, Undefined] = field(default="Dislike")
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Dislike",
+        kw_only=True,
+    )

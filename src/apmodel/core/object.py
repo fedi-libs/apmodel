@@ -1,15 +1,21 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import TYPE_CHECKING, Annotated, List, Optional, TypeVar, Union
 
 from pydantic import BeforeValidator, Field
 
+from apmodel.types.aliases import (
+    JSONLD_CONTEXT,
+    OPT_DATETIME,
+    OPT_STR,
+    OPT_STR_OR_LINK,
+)
+
 from ..context import LDContext
-from ..helpers import get_value_from_array
+from ..helpers import generate_aliases, get_value_from_array
 
 # from ..dumper import _serialize_model_to_json
-from ..types import ActivityPubModel, parse_ld_context
+from ..types import ActivityPubModel
 
 if TYPE_CHECKING:
     from ..extra.emoji import Emoji
@@ -18,59 +24,38 @@ if TYPE_CHECKING:
     from ..vocab.actor import Actor
     from ..vocab.document import Image
     from .collection import Collection
-    from .link import Link
 
 T = TypeVar("T", bound="Object")
 
 
 class Object(ActivityPubModel):
-    context: Annotated[LDContext, BeforeValidator(parse_ld_context)] = Field(
+    context: JSONLD_CONTEXT = Field(
         alias="@context",
         kw_only=True,
         default_factory=lambda: LDContext(
             ["https://www.w3.org/ns/activitystreams"]
         ),
     )
-    id: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = Field(
+    id: OPT_STR = Field(
         validation_alias="@id", serialization_alias="@id", default=None
     )
-    type: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field(
-            alias="@type",
-            default="https://www.w3.org/ns/activitystreams#Object",
-            kw_only=True,
-        )
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Object",
+        kw_only=True,
     )
-    name: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field(
-            validation_alias="https://www.w3.org/ns/activitystreams#name",
-            serialization_alias="https://www.w3.org/ns/activitystreams#name",
-            default=None,
-        )
+    name: OPT_STR = Field(default=None, **generate_aliases("name", "as2"))
+    content: OPT_STR = Field(default=None, **generate_aliases("content", "as2"))
+    summary: OPT_STR = Field(
+        alias="https://www.w3.org/ns/activitystreams#summary", default=None
     )
-    content: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field(
-            validation_alias="https://www.w3.org/ns/activitystreams#content",
-            serialization_alias="https://www.w3.org/ns/activitystreams#content",
-            default=None,
-        )
+    url: OPT_STR_OR_LINK = Field(
+        alias="https://www.w3.org/ns/activitystreams#url", default=None
     )
-    summary: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field(
-            alias="https://www.w3.org/ns/activitystreams#summary", default=None
-        )
-    )
-    url: Annotated[
-        Optional[Union[str, "Link"]], BeforeValidator(get_value_from_array)
-    ] = Field(alias="https://www.w3.org/ns/activitystreams#url", default=None)
-    published: Annotated[
-        Optional[datetime], BeforeValidator(get_value_from_array)
-    ] = Field(
+    published: OPT_DATETIME = Field(
         alias="https://www.w3.org/ns/activitystreams#published", default=None
     )
-    updated: Annotated[
-        Optional[datetime], BeforeValidator(get_value_from_array)
-    ] = Field(
+    updated: OPT_DATETIME = Field(
         alias="https://www.w3.org/ns/activitystreams#updated", default=None
     )
     attributed_to: Annotated[

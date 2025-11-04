@@ -1,26 +1,20 @@
 import datetime
-from dataclasses import dataclass, field
-from typing import Union
+from typing import Annotated, Optional, Union
+
+from pydantic import BeforeValidator, Field
+
+from apmodel.helpers import get_value_from_array
+from apmodel.types.aliases import OPT_DATETIME
 
 from ..core.object import Object
-from ..types import Undefined
 
-@dataclass
 class Tombstone(Object):
-    type: Union[str, Undefined] = field(default="Tombstone")
-    formerType: str | Object | Undefined = field(default_factory=Undefined)
-    deleted: datetime.datetime | str | Undefined = field(default_factory=Undefined)
-
-    def __post_init__(self):
-        if isinstance(self.deleted, str):
-            self.deleted = datetime.datetime.fromisoformat(self.deleted.replace("Z", "+00:00"))
-
-    def to_json(self):
-        data = super().to_json()
-        
-        # Handle deleted field serialization without modifying instance state
-        if isinstance(self.deleted, datetime.datetime):
-            data['deleted'] = self.deleted.isoformat(timespec='seconds').replace('+00:00', 'Z')
-        # For other types (str, Undefined), super().to_json() should handle them correctly
-
-        return data
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Tombstone",
+        kw_only=True,
+        alias="@type",
+    )
+    formerType: Annotated[
+        Optional[Union[str, Object]], BeforeValidator(get_value_from_array)
+    ] = Field(default=None)
+    deleted: OPT_DATETIME  = Field(default=None)

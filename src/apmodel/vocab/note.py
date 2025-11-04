@@ -1,8 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
-from ..types import Undefined
+from pydantic import Field
+
 from ..core.object import Object
 
-@dataclass
+
 class Note(Object):
-    type: Union[str, Undefined] = field(default="Note")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Note",
+        kw_only=True,
+        alias="@type",
+    )

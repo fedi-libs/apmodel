@@ -1,13 +1,16 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined, ActivityPubModel
+from apmodel.types.aliases import OPT_STR
 
-@dataclass
+from ...types import ActivityPubModel
+
+
 class PropertyValue(ActivityPubModel):
-    type: Union[str, Undefined] = field(default="PropertyValue", kw_only=True)
+    type: str = Field(
+        default="https://schema.org#PropertyValue",
+        kw_only=True,
+        alias="@type",
+    )
 
-    name: Union[str, Undefined] = field(default_factory=Undefined)
-    value: Union[str, Undefined] = field(default_factory=Undefined)
-
-    _extra: dict = field(default_factory=dict)
+    name: OPT_STR = Field(default=None)
+    value: OPT_STR = Field(default=None)

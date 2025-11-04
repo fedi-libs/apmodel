@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined
 from ...core.activity import Activity
 
-@dataclass
+
 class Undo(Activity):
-    type: Union[str, Undefined] = field(default="Undo")
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Undo",
+        kw_only=True,
+    )

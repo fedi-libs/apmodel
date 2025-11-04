@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING, Annotated, Optional, Union
 
 from pydantic import BeforeValidator, Field
 
+from apmodel.types.aliases import OPT_STR
+
 from ..context import LDContext
-from ..helpers import get_value_from_array
-from ..types import ActivityPubModel, parse_ld_context
+from ..helpers import get_value_from_array, parse_ld_context
+from ..types import ActivityPubModel
 
 if TYPE_CHECKING:
     from .object import Object
@@ -21,19 +23,13 @@ class Link(ActivityPubModel):
         ),
     )
 
-    type: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field(default="Link")
-    )
+    type: str = Field(default="Link")
     id: Annotated[
         Optional[Union[str, "Object", "Link"]],
         BeforeValidator(get_value_from_array),
     ] = Field()
-    name: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field()
-    )
-    href: Annotated[Optional[str], BeforeValidator(get_value_from_array)] = (
-        Field()
-    )
+    name: OPT_STR = Field()
+    href: OPT_STR = Field()
     hreflang: Annotated[
         Optional[str], BeforeValidator(get_value_from_array)
     ] = Field()

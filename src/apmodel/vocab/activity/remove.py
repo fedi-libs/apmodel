@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined
 from ...core.activity import Activity
 
-@dataclass
+
 class Remove(Activity):
-    type: Union[str, Undefined] = field(default="Remove")
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Remove",
+        kw_only=True,
+    )

@@ -1,25 +1,39 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ..types import Undefined
 from ..core.object import Object
 
-@dataclass
+
 class Document(Object):
-    type: Union[str, Undefined] = field(default="Document")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Document",
+        kw_only=True,
+        alias="@type",
+    )
 
-@dataclass
 class Audio(Document):
-    type: Union[str, Undefined] = field(default="Audio")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Audio",
+        kw_only=True,
+        alias="@type",
+    )
 
-@dataclass
 class Image(Document):
-    type: Union[str, Undefined] = field(default="Image")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Image",
+        kw_only=True,
+        alias="@type",
+    )
 
-@dataclass
 class Video(Document):
-    type: Union[str, Undefined] = field(default="Video")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Video",
+        kw_only=True,
+        alias="@type",
+    )
 
-@dataclass
 class Page(Document):
-    type: Union[str, Undefined] = field(default="Page")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Page",
+        kw_only=True,
+        alias="@type",
+    )

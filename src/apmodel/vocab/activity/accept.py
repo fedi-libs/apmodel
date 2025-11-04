@@ -1,13 +1,19 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined
 from ...core.activity import Activity
 
-@dataclass
-class Accept(Activity):
-    type: Union[str, Undefined] = field(default="Accept")
 
-@dataclass
+class Accept(Activity):
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Accept",
+        kw_only=True,
+    )
+
+
 class TentativeAccept(Accept):
-    type: Union[str, Undefined] = field(default="TentativeAccept")
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#TentativeAccept",
+        kw_only=True,
+    )

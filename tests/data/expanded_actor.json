@@ -1,0 +1,184 @@
+[
+  {
+    "https://w3id.org/security#assertionMethod": [
+      {
+        "https://w3id.org/security#controller": [
+          {
+            "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000"
+          }
+        ],
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000#main-key",
+        "https://w3id.org/security#publicKeyMultibase": [
+          {
+            "@type": "https://w3id.org/security#multibase",
+            "@value": "zgghBUVkqmWS8e1itBYLWoNKBNcSun3ucp2x3T4dSFJQToQjkwx6zDotjx1apKsyan2LyvzrpMG1iWCYVgHSnAcMEtruWfzZ42Ra8JnJAL7J17YQGuhxzgo9cN2DyjHztL7gGoQUx19bcT5VQRS2qmgUsoZsbPdRgizXPU37aPgWnjuW4Q8JepCP7ZNNAbqe9s4yiDEKrV9G4HG8UByQpr3BJAjD5BTE1WZmjkEHYxkLU36GdvC2kRvnYXAKD7uDpcweUMq2gRQcFKYLMeLWbTfB8YYHWadywAtH6MHZzdU3qCcZRifBJktnXyA57AvwmiQe4Th4NyGL5JgyT2EXsaDknhayyY5QbsS9QuuAS4gAQXwUTUbMbKogQzXXKn4xkecXYwsexgPHfCsMQJUcBwk6NfUKERftR6P849QbaMtN1WpWAM6G8ysoieUgrtT8MeAraCw86V3BVWxE2VrgrvPewTvtDSaJSV8quy48bRSAKXuoTuhHKVRXnPhPdwZwhv1iHpU8ncMHMc1h59cYiUhHn1vBCX8sSL97HXAYqKeVwi2WzRjXU5Bw9nGA2ibTEAy2i4xbyWWWPEBCrUgQBUR3oAk6YzbquHvQhxoDpwxmHTUcQ2wRfpo13mEyMvLnmBkpoKNjAkJaMfsyrKw794rD3o75zTTodXRNqXVrVFmcXBR7Y1G3YN5KiJiqRk5YEgVFKG8z8R8xyafQoS"
+          }
+        ],
+        "@type": [
+          "https://w3id.org/security#Multikey"
+        ]
+      },
+      {
+        "https://w3id.org/security#controller": [
+          {
+            "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000"
+          }
+        ],
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000#key-2",
+        "https://w3id.org/security#publicKeyMultibase": [
+          {
+            "@type": "https://w3id.org/security#multibase",
+            "@value": "z6Mks7M55fimSLUJDi85mrSPXABJF3kLaeC9PuRTVpxKE6LT"
+          }
+        ],
+        "@type": [
+          "https://w3id.org/security#Multikey"
+        ]
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#attachment": [
+      {
+        "https://www.w3.org/ns/activitystreams#name": [
+          {
+            "@value": "main (Example)"
+          }
+        ],
+        "@type": [
+          "http://schema.org#PropertyValue"
+        ],
+        "http://schema.org#value": [
+          {
+            "@value": "<a href=\"https://example.com/@ExampleUser\" rel=\"me\" translate=\"no\">@ExampleUser@example.com</a>"
+          }
+        ]
+      },
+      {
+        "https://www.w3.org/ns/activitystreams#name": [
+          {
+            "@value": "ExampleSite"
+          }
+        ],
+        "@type": [
+          "http://schema.org#PropertyValue"
+        ],
+        "http://schema.org#value": [
+          {
+            "@value": "<a href=\"https://example.com\" rel=\"me\" translate=\"no\">example.com</a>"
+          }
+        ]
+      },
+      {
+        "https://www.w3.org/ns/activitystreams#name": [
+          {
+            "@value": "ExampleBlog"
+          }
+        ],
+        "@type": [
+          "http://schema.org#PropertyValue"
+        ],
+        "http://schema.org#value": [
+          {
+            "@value": "<a href=\"https://example.com/example\" rel=\"me\" translate=\"no\">@example</a>"
+          }
+        ]
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#endpoints": [
+      {
+        "https://www.w3.org/ns/activitystreams#sharedInbox": [
+          {
+            "@id": "https://example.com/ap/inbox"
+          }
+        ],
+        "@type": [
+          "https://www.w3.org/ns/activitystreams#Endpoints"
+        ]
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#followers": [
+      {
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000/followers"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#following": [
+      {
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000/followees"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#icon": [
+      {
+        "@type": [
+          "https://www.w3.org/ns/activitystreams#Image"
+        ],
+        "https://www.w3.org/ns/activitystreams#url": [
+          {
+            "@id": "https://media.example.com/avatars/avatar.jpg"
+          }
+        ]
+      }
+    ],
+    "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000",
+    "http://www.w3.org/ns/ldp#inbox": [
+      {
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000/inbox"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#manuallyApprovesFollowers": [
+      {
+        "@value": false
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#name": [
+      {
+        "@value": "ExampleUser"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#outbox": [
+      {
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000/outbox"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#preferredUsername": [
+      {
+        "@value": "example"
+      }
+    ],
+    "https://w3id.org/security#publicKey": [
+      {
+        "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000#main-key",
+        "https://w3id.org/security#owner": [
+          {
+            "@id": "https://example.com/ap/actors/00000000-0000-0000-0000-000000000000"
+          }
+        ],
+        "https://w3id.org/security#publicKeyPem": [
+          {
+            "@value": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAujq2aKjF6BDmwnum+mHe\ndfvixxHbTqMWoD0U+QHmaGdw38iYogNg56BQQuJAZm93e4YuDKJpa+JfcSrRqQc1\nkwRQkvDQu4rTkIhbQPkooLJ/Ij3dNce5z0bQaFeWDoOypTNQd+NoiXKLvbJus4W9\nBaq4pCQ97MOznO372DrcV9DzEcXLUJNmw31Ml7GGa+RZuh2LJ6nzKCZQHadICx99\nFhWsTDSR+zpt2DCFNPPsCaGEJjNnREVvqHT8gusuEqwC1qDYj2INjgQIJe2MftbF\nOgi6IzmyfzG5oaLQlu53g1io9/Uxy1m/EXOp1ELATQRgrCHiy/dm0Y+ub+9gt6m6\nsk9Om/JwMtdZr+G0bIiZvdiZQP2uU2r1uYFiiPU4TVz7Ur4jAkNc+TsvEbHNb36m\nxcE6E4S61Yev8/7Xs2rYs7z/RD52bDtDllvGSWpx/HJCcu8do7ChCJZ1Sk4ijgY9\n+sE9s55353emQOL8RtUbslhCCiQ951lJFjBb0uREkDJrAnstFVvqLO5pmykRR3yu\ncYZCRePRA0zveQNKcwp1qJxOkZHSClFhDmAqAOVxwbLidDJ9zJeDdKN2rE8mtI62\n4E3xUSGDgxJC/8YFfSmvx0saC12YKal/TQ+NmSWKLKFCeO3VDbUwgYLuovGxSvPj\nYq0zYLULJnTBgz7omau14oUCAwEAAQ==\n-----END PUBLIC KEY-----"
+          }
+        ],
+        "@type": [
+          "https://w3id.org/security#Key"
+        ]
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#published": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2025-05-03T13:39:55.738Z"
+      }
+    ],
+    "https://www.w3.org/ns/activitystreams#summary": [
+      {
+        "@value": "<p>This is an example summary.</p>"
+      }
+    ],
+    "@type": [
+      "https://www.w3.org/ns/activitystreams#Person"
+    ],
+    "https://www.w3.org/ns/activitystreams#url": [
+      {
+        "@id": "https://example.com/@example"
+      }
+    ]
+  }
+]

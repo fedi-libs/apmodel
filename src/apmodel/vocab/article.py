@@ -1,8 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
-from ..types import Undefined
+from pydantic import Field
+
 from ..core.object import Object
 
-@dataclass
+
 class Article(Object):
-    type: Union[str, Undefined] = field(default="Article")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Article",
+        kw_only=True,
+        alias="@type",
+    )

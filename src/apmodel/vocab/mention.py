@@ -1,8 +1,11 @@
-from dataclasses import field
-from typing import Union
+from pydantic import Field
 
-from ..types import Undefined
 from ..core.link import Link
 
+
 class Mention(Link):
-    type: Union[str, Undefined] = field(default="Mention")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Mention",
+        kw_only=True,
+        alias="@type",
+    )

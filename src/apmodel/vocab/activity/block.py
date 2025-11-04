@@ -1,9 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Union
+from pydantic import Field
 
-from ...types import Undefined
-from .ignore import Ignore
+from ...core.activity import Activity
 
-@dataclass
-class Block(Ignore):
-    type: Union[str, Undefined] = field(default="Block")
+
+class Block(Activity):
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Block",
+        kw_only=True,
+    )

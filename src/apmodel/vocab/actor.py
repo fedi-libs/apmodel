@@ -1,110 +1,118 @@
-from dataclasses import dataclass, field
-from typing import List, Union
+from typing import Annotated, List, Optional, TypeAlias, Union
 
-from ..context import LDContext
-from ..types import Undefined
+from pydantic import BeforeValidator, Field
+
+from apmodel.helpers import generate_aliases, get_value_from_array
+from apmodel.types.aliases import OPT_BOOLEAN, OPT_STR
+
 from ..core.collection import Collection, OrderedCollection
 from ..core.object import Object
 from ..extra.cid import Multikey
 from ..extra.security import CryptographicKey
 
-@dataclass
+ORDERED_COLLECTION: TypeAlias = Annotated[
+    Optional[Union[str, OrderedCollection]],
+    BeforeValidator(get_value_from_array),
+]
+COLLECTION: TypeAlias = Annotated[
+    Optional[Union[str, Collection]], BeforeValidator(get_value_from_array)
+]
+COLLECTION_OR_ORDERED_COLLECTION: TypeAlias = Annotated[
+    Optional[Union[str, OrderedCollection, Collection]],
+    BeforeValidator(get_value_from_array),
+]
+
+
 class ActorEndpoints(Object):
-    type: Union[str, Undefined] = field(default="as:Endpoints")
-    sharedInbox: Union[str, OrderedCollection, Undefined] = field(
-        default_factory=Undefined
+    type: str = Field(
+        alias="@type",
+        default="https://www.w3.org/ns/activitystreams#Endpoints",
+        kw_only=True,
+    )
+    sharedInbox: ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("sharedInbox", "as2")
     )
 
 
-@dataclass
 class Actor(Object):
-    inbox: Union[str, OrderedCollection, Undefined] = field(default_factory=Undefined)
-    outbox: Union[str, OrderedCollection, Undefined] = field(default_factory=Undefined)
-    followers: Union[str, OrderedCollection, Collection, Undefined] = field(
-        default_factory=Undefined
+    inbox: ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("inbox", "ldp")
     )
-    following: Union[str, OrderedCollection, Collection, Undefined] = field(
-        default_factory=Undefined
+    outbox: ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("outbox", "as2")
     )
-    liked: Union[str, OrderedCollection, Collection, Undefined] = field(
-        default_factory=Undefined
+    followers: COLLECTION_OR_ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("followers", "as2")
     )
-    streams: Union[str, Collection, Undefined] = field(default_factory=Undefined)
-    preferredUsername: Union[str, Undefined] = field(default_factory=Undefined)
-    endpoints: Union[ActorEndpoints, Undefined] = field(default_factory=Undefined)
-    discoverable: Union[bool, Undefined] = field(default_factory=Undefined)
-    indexable: Union[bool, Undefined] = field(default_factory=Undefined)
-    suspended: Union[bool, Undefined] = field(default_factory=Undefined)
-    memorial: Union[bool, Undefined] = field(default_factory=Undefined)
-    publicKey: Union[CryptographicKey, Undefined] = field(default_factory=Undefined)
-    assertionMethod: List[Multikey] = field(default_factory=list)
-
-    def to_json(self):
-        result = super().to_json()
-
-        # Create a new LDContext instance based on the context already in result
-        # This ensures we don't modify self._context directly
-        dynamic_context = LDContext(result.get("@context", []))
-
-        # Add Actor-specific contexts based on properties
-        if result.get("publicKey"):
-            dynamic_context.add("https://w3id.org/security/v1")
-        if result.get("assertionMethod"):
-            dynamic_context.add("https://w3id.org/did/v1")
-        if result.get("manuallyApprovesFollowers"):
-            dynamic_context.add({"manuallyApprovesFollowers": "as:manuallyApprovesFollowers"})
-        if result.get("sensitive"):
-            dynamic_context.add({"sensitive": "as:sensitive"})
-        if result.get("featured"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "featured": "toot:featured"})
-        if result.get("featuredTags"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "featured": "toot:featuredTags"})
-        if result.get("indexable"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "indexable": "toot:indexable"})
-        if result.get("discoverable"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "discoverable": "toot:discoverable"})
-        if result.get("suspended"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "suspended": "toot:suspended"})
-        if result.get("memorial"):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "memorial": "toot:memorial"})
-        
-        # Check for specific types within attachment and tag lists
-        # Note: This assumes PropertyValue, Emoji, Hashtag are ActivityPubModel instances
-        # and their to_json methods would have been called by super().to_json()
-        # We are checking the *serialized* result here.
-        if any(isinstance(item, dict) and item.get("type") == "PropertyValue" for item in result.get("attachment", [])):
-            dynamic_context.add({"schema": "http://schema.org#", "value": "schema:value", "PropertyValue": "schema:PropertyValue"})
-        if any(isinstance(item, dict) and item.get("type") == "Emoji" for item in result.get("tag", [])):
-            dynamic_context.add({"toot": "http://joinmastodon.org/ns#", "Emoji": "toot:Emoji"})
-        if any(isinstance(item, dict) and item.get("type") == "Hashtag" for item in result.get("tag", [])):
-            dynamic_context.add({"Hashtag": "https://www.w3.org/ns/activitystreams#Hashtag"})
-
-        # Update the @context in the result dictionary
-        result["@context"] = dynamic_context.full_context
-
-        return result
+    following: COLLECTION_OR_ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("following", "as2")
+    )
+    liked: COLLECTION_OR_ORDERED_COLLECTION = Field(
+        default=None, **generate_aliases("liked", "as2")
+    )
+    streams: COLLECTION = Field(
+        default=None, **generate_aliases("streams", "as2")
+    )
+    preferred_username: OPT_STR = Field(
+        default=None, **generate_aliases("preferredUsername", "as2")
+    )
+    endpoints: Annotated[
+        Optional[Union[str, ActorEndpoints]],
+        BeforeValidator(get_value_from_array),
+    ] = Field(default=None, **generate_aliases("endpoints", "as2"))
+    discoverable: OPT_BOOLEAN = Field(
+        default=None, **generate_aliases("discoverable", "mastodon")
+    )
+    indexable: OPT_BOOLEAN = Field(
+        default=None, **generate_aliases("indexable", "mastodon")
+    )
+    suspended: OPT_BOOLEAN = Field(
+        default=None, **generate_aliases("suspended", "mastodon")
+    )
+    #    memorial: OPT_BOOLEAN = Field(default=None)
+    public_key: Annotated[
+        Optional[CryptographicKey], BeforeValidator(get_value_from_array)
+    ] = Field(default=None, **generate_aliases("publicKey", "security"))
+    assertion_method: List[Multikey] = Field(
+        default_factory=list, **generate_aliases("assertionMethod", "security")
+    )
 
 
-@dataclass
 class Application(Actor):
-    type: Union[str, Undefined] = field(default="Application")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Application",
+        kw_only=True,
+        alias="@type",
+    )
 
 
-@dataclass
 class Group(Actor):
-    type: Union[str, Undefined] = field(default="Group")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Group",
+        kw_only=True,
+        alias="@type",
+    )
 
 
-@dataclass
 class Organization(Actor):
-    type: Union[str, Undefined] = field(default="Organization")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Organization",
+        kw_only=True,
+        alias="@type",
+    )
 
 
-@dataclass
 class Person(Actor):
-    type: Union[str, Undefined] = field(default="Person")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Person",
+        kw_only=True,
+        alias="@type",
+    )
 
 
-@dataclass
 class Service(Actor):
-    type: Union[str, Undefined] = field(default="Service")
+    type: str = Field(
+        default="https://www.w3.org/ns/activitystreams#Service",
+        kw_only=True,
+        alias="@type",
+    )
