@@ -2,9 +2,8 @@ import glob
 import json
 import os
 from functools import lru_cache
-from typing import Callable
 
-from pyld.documentloader import requests
+from pyld import jsonld
 
 _PRELOADS_DIR = os.path.join(os.path.dirname(__file__), "_preloads")
 
@@ -32,17 +31,8 @@ def get_schema(path: str) -> dict:
         full_data = json.load(f)
         return full_data.get("schema", {})
 
-@lru_cache(maxsize=100)
-def cached_loader(requests_loader: Callable[[str, dict], dict], url, options={}):
-    options["headers"]["Accept"] = (
-        "application/ld+json;profile=http://www.w3.org/ns/json-ld#context, application/ld+json, application/json;q=0.5, text/html;q=0.8, application/xhtml+xml;q=0.8"
-    )
-    return requests_loader(url, options)
 
-
-def preloaded_loader(*args, **kwargs):
-    requests_loader = requests.requests_document_loader(*args, **kwargs)
-
+def create_document_loader(*args, **kwargs):
     def loader(url, options={}):
         if url in PRELOAD_JSONLD_PATH_MAPPINGS:
             file_path = PRELOAD_JSONLD_PATH_MAPPINGS[url]
@@ -57,6 +47,10 @@ def preloaded_loader(*args, **kwargs):
             }
 
         else:
-            return cached_loader(requests_loader, url, options)
+            raise jsonld.JsonLdError(
+                "Remote context fetching is disabled for security reasons.",
+                "jsonld.LoadContextFailed",
+                {"url": url},
+            )
 
     return loader
