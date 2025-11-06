@@ -2,8 +2,13 @@ import glob
 import json
 import os
 from functools import lru_cache
-from typing import Callable
 
+import ipaddress
+import socket
+from typing import Callable
+from urllib.parse import urlparse
+
+from pyld import jsonld
 from pyld.documentloader import requests
 
 _PRELOADS_DIR = os.path.join(os.path.dirname(__file__), "_preloads")
@@ -32,6 +37,7 @@ def get_schema(path: str) -> dict:
         full_data = json.load(f)
         return full_data.get("schema", {})
 
+
 @lru_cache(maxsize=100)
 def cached_loader(requests_loader: Callable[[str, dict], dict], url, options={}):
     options["headers"]["Accept"] = (
@@ -40,7 +46,7 @@ def cached_loader(requests_loader: Callable[[str, dict], dict], url, options={})
     return requests_loader(url, options)
 
 
-def preloaded_loader(*args, **kwargs):
+def create_document_loader(*args, **kwargs):
     requests_loader = requests.requests_document_loader(*args, **kwargs)
 
     def loader(url, options={}):
@@ -57,6 +63,24 @@ def preloaded_loader(*args, **kwargs):
             }
 
         else:
+            parsed_url = urlparse(url)
+            hostname = parsed_url.hostname
+            if hostname:
+                try:
+                    ip = ipaddress.ip_address(socket.gethostbyname(hostname))
+                    if ip.is_private or ip.is_loopback:
+                        raise jsonld.JsonLdError(
+                            "Loading from local or private network is not allowed.",
+                            "jsonld.LoadContextFailed",
+                            {"url": url},
+                        )
+                except socket.gaierror:
+                    raise jsonld.JsonLdError(
+                        "Could not resolve hostname.",
+                        "jsonld.LoadContextFailed",
+                        {"url": url},
+                    )
+
             return cached_loader(requests_loader, url, options)
 
     return loader
