@@ -1,10 +1,9 @@
 import glob
+import ipaddress
 import json
 import os
-from functools import lru_cache
-
-import ipaddress
 import socket
+from functools import lru_cache
 from typing import Callable
 from urllib.parse import urlparse
 
@@ -39,7 +38,12 @@ def get_schema(path: str) -> dict:
 
 
 @lru_cache(maxsize=100)
-def cached_loader(requests_loader: Callable[[str, dict], dict], url, options={}):
+def cached_loader(
+    requests_loader: Callable[[str, dict], dict], url, options_str: str
+):
+    options = json.loads(options_str)
+    if "headers" not in options:
+        options["headers"] = {}
     options["headers"]["Accept"] = (
         "application/ld+json;profile=http://www.w3.org/ns/json-ld#context, application/ld+json, application/json;q=0.5, text/html;q=0.8, application/xhtml+xml;q=0.8"
     )
@@ -81,6 +85,7 @@ def create_document_loader(*args, **kwargs):
                         {"url": url},
                     )
 
-            return cached_loader(requests_loader, url, options)
+            options_str = json.dumps(options, sort_keys=True)
+            return cached_loader(requests_loader, url, options_str)
 
     return loader
