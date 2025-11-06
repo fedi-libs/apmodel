@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, Optional, Union
+from typing import TYPE_CHECKING, Annotated, ClassVar
 
 from pydantic import BeforeValidator, Field
 
-from apmodel.types.aliases import OPT_STR
+from apmodel.types.aliases import OPT_STR, OPT_STR_OR_OBJECT_OR_LINK
 
 from ..context import LDContext
-from ..helpers import get_value_from_array, parse_ld_context
+from ..helpers import generate_aliases, parse_ld_context
 from ..types import ActivityPubModel
 
 if TYPE_CHECKING:
-    from .object import Object
+    pass
 
 
 class Link(ActivityPubModel):
@@ -22,17 +22,16 @@ class Link(ActivityPubModel):
             ["https://www.w3.org/ns/activitystreams"]
         ),
     )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Link"
 
-    type: str = Field(default="Link")
-    id: Annotated[
-        Optional[Union[str, "Object", "Link"]],
-        BeforeValidator(get_value_from_array),
-    ] = Field()
-    name: OPT_STR = Field()
-    href: OPT_STR = Field()
-    hreflang: Annotated[
-        Optional[str], BeforeValidator(get_value_from_array)
-    ] = Field()
-    mediaType: Annotated[
-        Optional[str], BeforeValidator(get_value_from_array)
-    ] = Field()
+    id: OPT_STR_OR_OBJECT_OR_LINK = Field(
+        validation_alias="@id", serialization_alias="@id"
+    )
+    name: OPT_STR = Field(default=None, **generate_aliases("name", "as2"))
+    href: OPT_STR = Field(default=None, **generate_aliases("href", "as2"))
+    href_lang: OPT_STR = Field(
+        default=None, **generate_aliases("hreflang", "as2")
+    )
+    media_type: OPT_STR = Field(
+        default=None, **generate_aliases("mediaType", "as2")
+    )

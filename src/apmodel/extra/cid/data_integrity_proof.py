@@ -1,8 +1,10 @@
+from typing import ClassVar
+
 from pydantic import Field
 
+from apmodel.helpers import generate_aliases
 from apmodel.types.aliases import (
     JSONLD_CONTEXT,
-    OPT_STR,
     STR_OR_DATETIME,
     STRING,
 )
@@ -22,10 +24,10 @@ class DataIntegrityProof(ActivityPubModel):
         alias="@context",
         kw_only=True,
     )
+    AS_URI: ClassVar[str] = "https://w3id.org/security#DataIntegrityProof"
 
-    type: str = Field(default="DataIntegrityProof", kw_only=True)
-    cryptosuite: STRING
-    proofValue: STRING
-    proofPurpose: STRING
-    verificationMethod: STRING
-    created: STR_OR_DATETIME
+    cryptosuite: STRING = Field(**generate_aliases("cryptosuite", "security"))
+    proof_value: STRING = Field(**generate_aliases("proofValue", "security"))
+    proof_purpose: STRING = Field(**generate_aliases("proofPurpose", "security"))
+    verification_method: STRING = Field(**generate_aliases("verificationMethod", "security"))
+    created: STR_OR_DATETIME = Field(validation_alias="http://purl.org/dc/terms/created", serialization_alias="http://purl.org/dc/terms/created")

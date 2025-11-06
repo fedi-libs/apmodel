@@ -16,19 +16,6 @@ class GeneratedAliasesParams(TypedDict):
     validation_alias: str
     serialization_alias: str
 
-
-def check_pem_type_by_header(pem_string: str) -> bool:
-    cleaned_string = pem_string.replace("\r", "")
-    first_line = cleaned_string.strip().split("\n")[0].strip()
-
-    if "PRIVATE KEY" in first_line:
-        return True
-    elif "PUBLIC KEY" in first_line:
-        return False
-    else:
-        raise ValueError("Unsupported PEM file")
-
-
 def generate_aliases(
     suffix: str,
     schema: Literal[
@@ -184,7 +171,7 @@ def get_value_from_array(v: Any) -> Any:
 
 
 def parse_ld_context(v: List) -> LDContext:
-    if not isinstance(v, list):
+    if not isinstance(v, list) and not isinstance(v, str):
         raise PydanticCustomError(
             "invalid_type",
             "Input must be a list to be converted to LDContexts, got {input_type}",

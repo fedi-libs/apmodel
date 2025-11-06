@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated, List, Optional, TypeVar, Union
 
-from pydantic import BeforeValidator, ConfigDict, Field
+from pydantic import BeforeValidator, Field
 
 from apmodel.types.aliases import (
     JSONLD_CONTEXT,
@@ -29,10 +29,6 @@ T = TypeVar("T", bound="Object")
 
 
 class Object(ActivityPubModel):
-    model_config = ConfigDict(
-        serialize_by_alias=True 
-    )
-    
     context: JSONLD_CONTEXT = Field(
         validation_alias="@context",
         serialization_alias="@context",
@@ -41,21 +37,18 @@ class Object(ActivityPubModel):
             ["https://www.w3.org/ns/activitystreams"]
         ),
     )
+    AS_URI = "https://www.w3.org/ns/activitystreams#Object"
+
     id: OPT_STR = Field(
         validation_alias="@id", serialization_alias="@id", default=None
-    )
-    type: Annotated[str, BeforeValidator(get_value_from_array)] = Field(
-        alias="@type",
-        default="https://www.w3.org/ns/activitystreams#Object",
-        kw_only=True,
     )
     name: OPT_STR = Field(default=None, **generate_aliases("name", "as2"))
     content: OPT_STR = Field(default=None, **generate_aliases("content", "as2"))
     summary: OPT_STR = Field(
-        alias="https://www.w3.org/ns/activitystreams#summary", default=None
+        default=None, **generate_aliases("summary", "as2")
     )
     url: OPT_STR_OR_LINK = Field(
-        alias="https://www.w3.org/ns/activitystreams#url", default=None
+        default=None, **generate_aliases("url", "as2")
     )
     published: OPT_DATETIME = Field(
         alias="https://www.w3.org/ns/activitystreams#published", default=None

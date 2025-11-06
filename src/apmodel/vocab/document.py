@@ -1,39 +1,23 @@
-from pydantic import Field
+from typing import ClassVar
 
 from ..core.object import Object
 
 
 class Document(Object):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Document",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Document"
+
 
 class Audio(Document):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Audio",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Audio"
+
 
 class Image(Document):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Image",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Image"
+
 
 class Video(Document):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Video",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Video"
+
 
 class Page(Document):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Page",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Page"

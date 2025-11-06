@@ -15,6 +15,7 @@ from ..helpers import (
 
 if TYPE_CHECKING:
     from ..core.link import Link
+    from ..core.object import Object
 
 
 JSONLD_CONTEXT: TypeAlias = Annotated[
@@ -27,6 +28,11 @@ OPT_STR: TypeAlias = Annotated[
 
 OPT_STR_OR_LINK: TypeAlias = Annotated[
     Optional[Union[str, "Link"]], BeforeValidator(get_value_from_array)
+]
+
+OPT_STR_OR_OBJECT_OR_LINK: TypeAlias = Annotated[
+    Optional[Union[str, "Object", "Link"]],
+    BeforeValidator(get_value_from_array),
 ]
 
 OPT_DATETIME: TypeAlias = Annotated[

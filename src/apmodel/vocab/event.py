@@ -1,32 +1,25 @@
-from typing import Annotated, Literal, Optional, Union
+from typing import Annotated, ClassVar, Literal, Optional, Union
 
 from pydantic import BeforeValidator, Field
 
-from apmodel.helpers import get_value_from_array
+from apmodel.helpers import generate_aliases, get_value_from_array
 from apmodel.types.aliases import OPT_FLOAT
 
 from ..core.object import Object
 
 
 class Event(Object):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Event",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Event"
 
 
 class Place(Object):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Place",
-        kw_only=True,
-        alias="@type",
-    )
-    accuracy: OPT_FLOAT = Field(default=None)
-    altitude: OPT_FLOAT = Field(default=None)
-    latitude: OPT_FLOAT = Field(default=None)
-    longitude: OPT_FLOAT = Field(default=None)
-    radius: OPT_FLOAT = Field(default=None)
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Place"
+
+    accuracy: OPT_FLOAT = Field(default=None, **generate_aliases("accuracy", "as2"))
+    altitude: OPT_FLOAT = Field(default=None, **generate_aliases("altitude", "as2"))
+    latitude: OPT_FLOAT = Field(default=None, **generate_aliases("latitude", "as2"))
+    longitude: OPT_FLOAT = Field(default=None, **generate_aliases("longitude", "as2"))
+    radius: OPT_FLOAT = Field(default=None, **generate_aliases("radius", "as2"))
     units: Annotated[Optional[
         Union[str, Literal["cm", "feet", "inches", "km", "m", "miles"]]
-    ], BeforeValidator(get_value_from_array)] = Field(default=None)
+    ], BeforeValidator(get_value_from_array)] = Field(default=None, **generate_aliases("units", "as2"))

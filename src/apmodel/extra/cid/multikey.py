@@ -1,13 +1,9 @@
-from typing import Optional
+from typing import ClassVar
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
-from multiformats import multibase, multicodec
-from pydantic import Field, field_serializer
+from pydantic import ConfigDict, Field
 
 from apmodel.helpers import generate_aliases
 from apmodel.types.aliases import (
-    OPT_STR,
     PRIVKEY_MULTIBASE,
     PUBKEY_MULTIBASE,
     STRING,
@@ -17,11 +13,12 @@ from ...types import ActivityPubModel
 
 
 class Multikey(ActivityPubModel):
-    type: str = Field(
-        alias="@type",
-        default="https://w3id.org/security#Multikey",
-        kw_only=True,
+    model_config = ConfigDict(
+        serialize_by_alias=True,
+        extra="allow",
+        arbitrary_types_allowed=True
     )
+    AS_URI: ClassVar[str] = "https://w3id.org/security#Multikey"
 
     id: str
     controller: STRING = Field(**generate_aliases("controller", "security"))
@@ -32,6 +29,3 @@ class Multikey(ActivityPubModel):
     secret_key: PRIVKEY_MULTIBASE = Field(
         default=None, **generate_aliases("secretKeyMultibase", "security")
     )
-    
-    class Config:
-        arbitrary_types_allowed = True

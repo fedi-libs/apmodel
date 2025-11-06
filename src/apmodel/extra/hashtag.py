@@ -1,18 +1,7 @@
-from typing import Annotated, Optional
-
-from pydantic import BeforeValidator, Field
-
-from apmodel.types.aliases import OPT_STR
+from typing import ClassVar
 
 from ..core import Link
-from ..helpers import get_value_from_array
 
 
 class Hashtag(Link):
-    type: str = (
-        Field(
-            alias="@type",
-            default="https://www.w3.org/ns/activitystreams#Hashtag",
-            kw_only=True,
-        )
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Hashtag"

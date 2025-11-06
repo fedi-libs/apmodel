@@ -1,13 +1,7 @@
-from __future__ import annotations
+from typing import ClassVar
 
-from pydantic import Field
-
-from ..core import Object
+from ..core.object import Object
 
 
 class Emoji(Object):
-    type: str = Field(
-        alias="@type",
-        default="http://joinmastodon.org/ns#Emoji",
-        kw_only=True,
-    )
+    AS_URI: ClassVar[str] = "http://joinmastodon.org/ns#Emoji"

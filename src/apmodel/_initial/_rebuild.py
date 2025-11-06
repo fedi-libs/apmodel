@@ -33,7 +33,10 @@ from ..nodeinfo.nodeinfo import (
     NodeinfoUsageUsers,  # noqa: F401
 )
 from ..types import aliases  # noqa: F401
-from ..types.aliases import OPT_STR_OR_LINK  # noqa: F401
+from ..types.aliases import (  # noqa: F401
+    OPT_STR_OR_LINK,
+    OPT_STR_OR_OBJECT_OR_LINK,
+)
 from ..vocab.activity.accept import Accept, TentativeAccept  # noqa: F401
 from ..vocab.activity.add import Add  # noqa: F401
 from ..vocab.activity.announce import Announce  # noqa: F401

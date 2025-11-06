@@ -1,4 +1,4 @@
-from typing import Annotated, List, Optional, TypeAlias, Union
+from typing import Annotated, ClassVar, List, Optional, TypeAlias, Union
 
 from pydantic import BeforeValidator, Field
 
@@ -24,17 +24,16 @@ COLLECTION_OR_ORDERED_COLLECTION: TypeAlias = Annotated[
 
 
 class ActorEndpoints(Object):
-    type: str = Field(
-        alias="@type",
-        default="https://www.w3.org/ns/activitystreams#Endpoints",
-        kw_only=True,
-    )
-    sharedInbox: ORDERED_COLLECTION = Field(
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Endpoints"
+    
+    shared_inbox: ORDERED_COLLECTION = Field(
         default=None, **generate_aliases("sharedInbox", "as2")
     )
 
 
 class Actor(Object):
+    AS_URI: ClassVar[str] = "__apmodel_base__"
+
     inbox: ORDERED_COLLECTION = Field(
         default=None, **generate_aliases("inbox", "ldp")
     )
@@ -79,40 +78,20 @@ class Actor(Object):
 
 
 class Application(Actor):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Application",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Application"
 
 
 class Group(Actor):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Group",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Group"
 
 
 class Organization(Actor):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Organization",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Organization"
 
 
 class Person(Actor):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Person",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Person"
 
 
 class Service(Actor):
-    type: str = Field(
-        default="https://www.w3.org/ns/activitystreams#Service",
-        kw_only=True,
-        alias="@type",
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Service"

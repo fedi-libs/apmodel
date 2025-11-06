@@ -1,19 +1,11 @@
-from pydantic import Field
+from typing import ClassVar
 
 from ...core.activity import Activity
 
 
 class Accept(Activity):
-    type: str = Field(
-        alias="@type",
-        default="https://www.w3.org/ns/activitystreams#Accept",
-        kw_only=True,
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Accept"
 
 
 class TentativeAccept(Accept):
-    type: str = Field(
-        alias="@type",
-        default="https://www.w3.org/ns/activitystreams#TentativeAccept",
-        kw_only=True,
-    )
+    AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#TentativeAccept"
