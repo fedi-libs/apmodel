@@ -90,8 +90,19 @@ class ActivityPubModel(BaseModel):
         if isinstance(model_type, str):
             MODEL_DISPATCHER[model_type] = cls
 
-    def dump(self, compact: bool = True):
-        d = self.model_dump()
+    def dump(self, compact: bool = True, **kwargs):
+        """Dump the model.
+        
+        Dump model to jsonld-compatible dictionary.
+        
+        Args:
+            compact (boolean): If set True, apmodel run jsonld.compact in function and return compacted json-ld data.
+            **kwargs (any): extra arguments pass to pydantic's model_dump function.
+        
+        Returns:
+            dict: exported model dict.
+        """
+        d = self.model_dump(**kwargs)
         if compact:
             d = jsonld.compact(d, d["@context"])
         return d
