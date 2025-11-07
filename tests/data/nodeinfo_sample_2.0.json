@@ -2,8 +2,7 @@
     "version": "2.0",
     "software": {
         "name": "foofedi",
-        "version": "2025.8.27",
-        "homepage": "https://foofedi.example.com/"
+        "version": "2025.8.27"
     },
     "protocols": [
         "activitypub"

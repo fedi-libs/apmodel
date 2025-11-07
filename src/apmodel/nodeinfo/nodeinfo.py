@@ -1,7 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
+import sys
 from typing import List, Literal, Optional
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 from pydantic import (
     BaseModel,
@@ -12,7 +17,7 @@ from pydantic import (
 from pydantic_core import PydanticCustomError
 
 
-class NodeinfoProtocol(Enum):
+class NodeinfoProtocol(StrEnum):
     ACTIVITYPUB = "activitypub"
     BUDDYCLOUD = "buddycloud"
     DFRN = "dfrn"
@@ -25,7 +30,7 @@ class NodeinfoProtocol(Enum):
     ZOT = "zot"
 
 
-class NodeinfoInbound(Enum):
+class NodeinfoInbound(StrEnum):
     ATOM1_0 = "atom1.0"
     GNUSOCIAL = "gnusocial"
     IMAP = "imap"
@@ -36,7 +41,7 @@ class NodeinfoInbound(Enum):
     TWITTER = "twitter"
 
 
-class NodeinfoOutbound(Enum):
+class NodeinfoOutbound(StrEnum):
     ATOM1_0 = "atom1.0"
     GNUSOCIAL = "gnusocial"
     BLOGGER = "blogger"
