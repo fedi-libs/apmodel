@@ -37,11 +37,11 @@ def get_schema(path: str) -> dict:
         return full_data.get("schema", {})
 
 
-@lru_cache(maxsize=100)
+#@lru_cache(maxsize=100)
 def cached_loader(
-    requests_loader: Callable[[str, dict], dict], url, options_str: str
+    requests_loader: Callable[[str, dict], dict], url, options={}
 ):
-    options = json.loads(options_str)
+    #options = json.loads(options_str)
     if "headers" not in options:
         options["headers"] = {}
     options["headers"]["Accept"] = (
@@ -85,7 +85,8 @@ def create_document_loader(*args, **kwargs):
                         {"url": url},
                     )
 
-            options_str = json.dumps(options, sort_keys=True)
-            return cached_loader(requests_loader, url, options_str)
+            
+            #options_str = json.dumps(options, sort_keys=True)
+            return cached_loader(requests_loader, url, options)
 
     return loader

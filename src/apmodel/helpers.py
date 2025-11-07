@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Literal, TypedDict, Union
+from urllib.parse import urlparse, urlunparse
 from zoneinfo import ZoneInfo
 
 from cryptography.exceptions import InvalidKey
@@ -15,6 +16,211 @@ from apmodel.exceptions import InvalidField
 class GeneratedAliasesParams(TypedDict):
     validation_alias: str
     serialization_alias: str
+
+
+def to_jld(arr_str: bool = False, any_uri: bool = False):
+    def func(v: Any):
+        if arr_str:
+            return [v]
+        if isinstance(v, datetime):
+            iso_string_with_Z = v.isoformat().replace("+00:00", "Z")
+            return [
+                {
+                    "@type": "https://www.w3.org/2001/XMLSchema#dateTime",
+                    "@value": iso_string_with_Z,
+                }
+            ]
+        elif isinstance(v, bool):
+            return [
+                {
+                    "@type": "https://www.w3.org/2001/XMLSchema#boolean",
+                    "@value": v,
+                }
+            ]
+        elif isinstance(v, float):
+            return [
+                {
+                    "@type": "https://www.w3.org/2001/XMLSchema#float",
+                    "@value": v,
+                }
+            ]
+        elif isinstance(
+            v,
+            (
+                rsa.RSAPublicKey,
+                ed25519.Ed25519PublicKey,
+                rsa.RSAPrivateKey,
+                ed25519.Ed25519PrivateKey,
+            ),
+        ):
+            return [
+                {
+                    "@type": "https://w3id.org/security#multibase",
+                    "@value": ser_multibase(v),
+                }
+            ]
+        else:
+            if any_uri:
+                return [
+                    {
+                        "@type": "https://www.w3.org/2001/XMLSchema#anyURI",
+                        "@value": v,
+                    }
+                ]
+            return [{"@value": v}]
+
+    return func
+
+
+def generate_context_from_expanded(expanded_json_ld):
+    context_map = {}
+    uris_to_process = set()
+
+    # 1. すべてのURIを収集
+    for item in expanded_json_ld:
+        # プロパティのURI
+        for key in item.keys():
+            if key not in ("@id", "@type", "@context"):
+                # キー自体がURI
+                uris_to_process.add(key)
+                
+                # 値がオブジェクトで、@idを持っている場合（参照URI）
+                if isinstance(item[key], list):
+                    for sub_item in item[key]:
+                        if isinstance(sub_item, dict) and "@id" in sub_item:
+                            uris_to_process.add(sub_item["@id"])
+
+        # @type のURI
+        if "@type" in item:
+            for type_uri in item["@type"]:
+                if "://" in type_uri: # 完全なURIのみを対象
+                    uris_to_process.add(type_uri)
+
+        # @id のURI
+        if "@id" in item:
+            if "://" in item["@id"]:
+                uris_to_process.add(item["@id"])
+
+
+    # 2. URIを解析し、ネームスペースでグループ化
+    # { namespace_base: { local_name: full_uri, ... }, ... }
+    namespace_groups = {}
+    
+    # { full_uri: term, ... } - @idのように、ネームスペース化できないURI用
+    simple_terms = {}
+
+    for uri in uris_to_process:
+        parsed_uri = urlparse(uri)
+        
+        # フラグメント (例: #term) を持つURI
+        if parsed_uri.fragment:
+            namespace_base = urlunparse(parsed_uri._replace(fragment=""))
+            local_name = parsed_uri.fragment
+            
+            # https://www.w3.org/ns/activitystreams# のように末尾が # の場合は、# を除いたものをベースとする
+            if namespace_base.endswith('#'):
+                namespace_base = namespace_base[:-1]
+            
+            # 例: namespace_base="https://www.w3.org/ns/activitystreams", local_name="Object"
+            
+            if namespace_base:
+                if namespace_base not in namespace_groups:
+                    namespace_groups[namespace_base] = {}
+                namespace_groups[namespace_base][local_name] = uri
+                continue
+        
+        # パスセグメント (例: /term) を持つURI
+        elif parsed_uri.path:
+            path_segments = parsed_uri.path.rstrip("/").split("/")
+            local_name = path_segments[-1]
+            
+            # 例: http://schema.org/name の場合
+            # namespace_base="http://schema.org/"
+            # local_name="name"
+            if len(path_segments) > 1:
+                namespace_base_parts = parsed_uri.path[:-len(local_name)]
+                namespace_base = urlunparse(parsed_uri._replace(path=namespace_base_parts, params="", query="", fragment=""))
+                
+                if namespace_base:
+                    if namespace_base not in namespace_groups:
+                        namespace_groups[namespace_base] = {}
+                    namespace_groups[namespace_base][local_name] = uri
+                    continue
+
+        # ネームスペース化に適さないURI (例: ドメイン全体が@idになる場合など)
+        term = uri.split('/')[-1].split('#')[-1] or uri # 最後のパス/フラグメントを試みる
+        simple_terms[uri] = term # タームは短縮されない
+        
+    
+    # 3. 統合された @context を構築
+    
+    # プレフィックスの生成とタームの定義
+    prefix_counter = 1
+    used_terms = set()
+    
+    # Activity Streamsの例に対応するため、ネームスペースでループ
+    for base_uri, local_names in namespace_groups.items():
+        
+        # プレフィックス名の候補
+        prefix_candidate = base_uri.split('/')[-1].split('#')[0].split('.')[-1].lower() or f"p{prefix_counter}"
+        
+        # プレフィックスが既存のタームと競合するかチェック
+        prefix_term = prefix_candidate
+        conflict_count = 0
+        while prefix_term in used_terms:
+            conflict_count += 1
+            prefix_term = f"{prefix_candidate}{conflict_count}"
+            
+        used_terms.add(prefix_term)
+
+        # プレフィックスの定義 (末尾に # または / をつける)
+        # ネームスペースに # が含まれていれば # を、そうでなければ / をつけるのが一般的
+        if base_uri.endswith('#'):
+            prefix_definition = f"{base_uri}"
+        elif base_uri.endswith('/'):
+            prefix_definition = f"{base_uri}"
+        else:
+            # プレフィックスとして使うため、末尾に適切な区切り文字を追加
+            if '#' in base_uri: # #ベースの場合は # をつける
+                prefix_definition = f"{base_uri}#"
+            else: # /ベースの場合は / をつける
+                prefix_definition = f"{base_uri}/"
+
+
+        context_map[prefix_term] = prefix_definition
+        
+        # ローカル名（ターム）の定義
+        for local_name, full_uri in local_names.items():
+            # URIがプレフィックス定義で完全に短縮できることを確認
+            if full_uri.startswith(prefix_definition):
+                # 完全に短縮できる場合は定義をスキップ (例: "as:Object" の形式になる)
+                pass 
+            else:
+                # 短縮できない、またはプレフィックスと完全に一致しないURIは個別定義
+                # このケースは非常に稀だが、安全のために残す
+                term_name = local_name
+                if term_name in used_terms: # プレフィックス名とローカル名が競合する場合
+                    term_name = f"{prefix_term}_{local_name}"
+                
+                context_map[term_name] = full_uri
+                used_terms.add(term_name)
+
+        prefix_counter += 1
+
+
+    # 4. ネームスペース化できなかったURIの処理
+    for uri, term in simple_terms.items():
+        if term in used_terms:
+            term = f"item_{term}"
+
+        context_map[term] = uri
+        used_terms.add(term)
+
+
+    context = {"@context": context_map}
+
+    return context
+
 
 def generate_aliases(
     suffix: str,
@@ -45,7 +251,9 @@ def generate_aliases(
     elif schema == "ldp":
         field_alias = f"https://www.w3.org/ns/ldp#{suffix}"
 
-    return {"validation_alias": field_alias, "serialization_alias": field_alias}
+    return GeneratedAliasesParams(
+        validation_alias=field_alias, serialization_alias=field_alias
+    )
 
 
 def has_match(data: Dict[str, Any], expected_keys: List[str]) -> bool:

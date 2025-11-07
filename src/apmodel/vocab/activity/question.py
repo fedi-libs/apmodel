@@ -1,9 +1,9 @@
 import datetime
 from typing import Annotated, ClassVar, Optional, TypeAlias, Union
 
-from pydantic import BeforeValidator, Field
+from pydantic import PlainSerializer, BeforeValidator, Field
 
-from apmodel.helpers import generate_aliases, get_value_from_array
+from apmodel.helpers import generate_aliases, get_value_from_array, to_jld
 
 from ...core.activity import IntransitiveActivity
 from ...core.link import Link
@@ -22,4 +22,5 @@ class Question(IntransitiveActivity):
     closed: Annotated[
         Optional[Union[str, Object, Link, datetime.datetime, bool]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld())
     ] = Field(default=None, **generate_aliases("closed", "as2"))

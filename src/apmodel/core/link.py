@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated, ClassVar
 
 from pydantic import BeforeValidator, Field
 
-from apmodel.types.aliases import OPT_STR, OPT_STR_OR_OBJECT_OR_LINK
+from apmodel.types.aliases import ID_OPT_STR_OR_OBJECT_OR_LINK, OPT_STR
 
 from ..context import LDContext
 from ..helpers import generate_aliases, parse_ld_context
@@ -24,7 +24,7 @@ class Link(ActivityPubModel):
     )
     AS_URI: ClassVar[str] = "https://www.w3.org/ns/activitystreams#Link"
 
-    id: OPT_STR_OR_OBJECT_OR_LINK = Field(
+    id: ID_OPT_STR_OR_OBJECT_OR_LINK = Field(
         validation_alias="@id", serialization_alias="@id"
     )
     name: OPT_STR = Field(default=None, **generate_aliases("name", "as2"))

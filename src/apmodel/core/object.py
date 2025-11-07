@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated, List, Optional, TypeVar, Union
 
-from pydantic import BeforeValidator, Field
+from pydantic import AliasChoices, BeforeValidator, Field, PlainSerializer
 
 from apmodel.types.aliases import (
+    ID_OPT_STR,
     JSONLD_CONTEXT,
     OPT_DATETIME,
     OPT_STR,
@@ -12,7 +13,7 @@ from apmodel.types.aliases import (
 )
 
 from ..context import LDContext
-from ..helpers import generate_aliases, get_value_from_array
+from ..helpers import generate_aliases, get_value_from_array, to_jld
 
 # from ..dumper import _serialize_model_to_json
 from ..types import ActivityPubModel
@@ -39,17 +40,15 @@ class Object(ActivityPubModel):
     )
     AS_URI = "https://www.w3.org/ns/activitystreams#Object"
 
-    id: OPT_STR = Field(
-        validation_alias="@id", serialization_alias="@id", default=None
+    id: ID_OPT_STR = Field(
+        validation_alias=AliasChoices("id", "@id"),
+        serialization_alias="@id",
+        default=None,
     )
     name: OPT_STR = Field(default=None, **generate_aliases("name", "as2"))
     content: OPT_STR = Field(default=None, **generate_aliases("content", "as2"))
-    summary: OPT_STR = Field(
-        default=None, **generate_aliases("summary", "as2")
-    )
-    url: OPT_STR_OR_LINK = Field(
-        default=None, **generate_aliases("url", "as2")
-    )
+    summary: OPT_STR = Field(default=None, **generate_aliases("summary", "as2"))
+    url: OPT_STR_OR_LINK = Field(default=None, **generate_aliases("url", "as2"))
     published: OPT_DATETIME = Field(
         alias="https://www.w3.org/ns/activitystreams#published", default=None
     )
@@ -59,74 +58,98 @@ class Object(ActivityPubModel):
     attributed_to: Annotated[
         Optional[Union[str, "Actor", List[Union[str, "Actor"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#attributedTo", default=None
     )
     audience: Annotated[
         Optional[Union[str, "Object", List[Union[str, "Object"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#audience", default=None
     )
     to: Annotated[
         Optional[Union[str, "Object", List[Union[str, "Object"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#to", default=None)
     bto: Annotated[
         Optional[Union[str, "Object", List[Union[str, "Object"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#bto", default=None)
     cc: Annotated[
         Optional[Union[str, "Object", List[Union[str, "Object"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#cc", default=None)
     bcc: Annotated[
         Optional[Union[str, "Object", List[Union[str, "Object"]]]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#bcc", default=None)
     generator: Annotated[
-        Optional["Object"], BeforeValidator(get_value_from_array)
+        Optional["Object"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#generator", default=None
     )
     icon: Annotated[
-        Optional["Image"], BeforeValidator(get_value_from_array)
+        Optional["Image"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#icon", default=None)
     image: Annotated[
-        Optional["Image"], BeforeValidator(get_value_from_array)
+        Optional["Image"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#image", default=None)
     in_reply_to: Annotated[
-        Optional["Object"], BeforeValidator(get_value_from_array)
+        Optional["Object"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#inReplyTo", default=None
     )
     location: Annotated[
-        Optional["Object"], BeforeValidator(get_value_from_array)
+        Optional["Object"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#location", default=None
     )
     preview: Annotated[
-        Optional["Object"], BeforeValidator(get_value_from_array)
+        Optional["Object"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#preview", default=None
     )
     replies: Annotated[
-        Optional["Collection"], BeforeValidator(get_value_from_array)
+        Optional["Collection"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#replies", default=None
     )
     scope: Annotated[
-        Optional["Object"], BeforeValidator(get_value_from_array)
+        Optional["Object"],
+        BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(alias="https://www.w3.org/ns/activitystreams#scope", default=None)
     tag: Annotated[
         List[Union["Object", "Hashtag", "Emoji"]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#tag", default_factory=list
     )
     attachment: Annotated[
         List[Union["Object", "PropertyValue"]],
         BeforeValidator(get_value_from_array),
+        PlainSerializer(to_jld()),
     ] = Field(
         alias="https://www.w3.org/ns/activitystreams#attachment",
         default_factory=list,

@@ -1,6 +1,6 @@
 from typing import Annotated, List, Optional, Union  # noqa: F401
 
-from pydantic import BeforeValidator  # noqa: F401
+from pydantic import BeforeValidator, PlainSerializer  # noqa: F401
 
 from ..core.activity import Activity
 from ..core.collection import (
@@ -19,7 +19,11 @@ from ..extra import Emoji, Hashtag  # noqa: F401
 from ..extra.cid import DataIntegrityProof, Multikey  # noqa: F401
 from ..extra.schema import PropertyValue  # noqa: F401
 from ..extra.security import CryptographicKey  # noqa: F401
-from ..helpers import get_value_from_array, parse_ld_context  # noqa: F401
+from ..helpers import (  # noqa: F401
+    get_value_from_array,
+    parse_ld_context,
+    to_jld,
+)
 
 # Nodeinfo
 from ..nodeinfo.nodeinfo import (
@@ -34,6 +38,8 @@ from ..nodeinfo.nodeinfo import (
 )
 from ..types import aliases  # noqa: F401
 from ..types.aliases import (  # noqa: F401
+    ID_OPT_STR,
+    ID_OPT_STR_OR_OBJECT_OR_LINK,
     OPT_STR_OR_LINK,
     OPT_STR_OR_OBJECT_OR_LINK,
 )

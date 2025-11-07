@@ -1,26 +1,29 @@
 import warnings
-from typing import Any, ClassVar, Dict, Optional
+from typing import Annotated, Any, ClassVar, Dict, Optional
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PlainSerializer,
     model_validator,
 )
 from pyld.context_resolver import jsonld
 
+from apmodel.context import generate_context_from_expanded
+from apmodel.helpers import to_jld
 from apmodel.types.aliases import JSONLD_CONTEXT
 
 from .._initial._dispatch import MODEL_DISPATCHER
 
 
 class ActivityPubModel(BaseModel):
-    model_config = ConfigDict(serialize_by_alias=True, extra="allow")
+    model_config = ConfigDict(serialize_by_alias=True, populate_by_name=True, extra="allow")
     AS_URI: ClassVar[str] = "__apmodel_base__"
 
     context: JSONLD_CONTEXT = Field(alias="@context")
-    type: Optional[str] = Field(
-        alias="@type", default=None, kw_only=True, frozen=True
+    type: Annotated[Optional[str], PlainSerializer(to_jld(arr_str=True))] = (
+        Field(alias="@type", default=None, kw_only=True, frozen=True)
     )
 
     raw_data_internal_key: Optional[Dict[str, Any]] = Field(
@@ -92,17 +95,22 @@ class ActivityPubModel(BaseModel):
 
     def dump(self, compact: bool = True, **kwargs):
         """Dump the model.
-        
+
         Dump model to jsonld-compatible dictionary.
-        
+
         Args:
             compact (boolean): If set True, apmodel run jsonld.compact in function and return compacted json-ld data.
             **kwargs (any): extra arguments pass to pydantic's model_dump function.
-        
+
         Returns:
             dict: exported model dict.
         """
-        d = self.model_dump(**kwargs)
+        jld_array = []
+        d = self.model_dump(**kwargs, exclude_none=True, exclude_defaults=True)
+        jld_array.append(d)
         if compact:
-            d = jsonld.compact(d, d["@context"])
+            a = generate_context_from_expanded(jld_array, self.context)
+            d = jsonld.compact(d, a["@context"])
+        else:
+            d = jld_array
         return d

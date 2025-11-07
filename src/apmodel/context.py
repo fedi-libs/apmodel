@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Dict, List, TypeVar, Union, overload
+from urllib.parse import urlparse, urlunparse
 
 from pydantic_core import core_schema
 
@@ -112,9 +113,7 @@ class LDContext:
         """
         Defines how Pydantic should handle the LDContext type.
         """
-        from_any_schema = core_schema.no_info_plain_validator_function(
-            cls
-        )
+        from_any_schema = core_schema.no_info_plain_validator_function(cls)
 
         to_full_context_serializer = (
             core_schema.plain_serializer_function_ser_schema(
@@ -127,3 +126,67 @@ class LDContext:
             python_schema=from_any_schema,
             serialization=to_full_context_serializer,
         )
+
+
+def _get_namespace_base(uri: str) -> Union[str, None]:
+    parsed_uri = urlparse(uri)
+
+    if parsed_uri.fragment:
+        base_url = urlunparse(parsed_uri._replace(fragment=""))
+
+        if not base_url.endswith("#") and not base_url.endswith("/"):
+            return base_url + "#"
+
+        return base_url
+
+    elif parsed_uri.path and parsed_uri.path != "/":
+        path_segments = parsed_uri.path.rstrip("/").split("/")
+        local_name = path_segments[-1]
+
+        if len(path_segments) > 1:
+            namespace_base_path = parsed_uri.path[: -len(local_name)]
+            base_url = urlunparse(
+                parsed_uri._replace(
+                    path=namespace_base_path, params="", query="", fragment=""
+                )
+            )
+
+            if base_url and not (
+                base_url.endswith("/") or base_url.endswith("#")
+            ):
+                return base_url + "/"
+
+            return base_url
+
+    return None
+
+def generate_context_from_expanded(expanded_json_ld: List[Dict[str, Any]], orig_context: LDContext = LDContext()) -> Dict[str, List[Union[str, Dict[str, Any]]]]:
+    uris_to_process = set()
+
+    for item in expanded_json_ld:
+        entity_id = item.get("@id")
+        for key in item.keys():
+                if key in ("@id", "@type", "@context"):
+                            continue
+                uris_to_process.add(key)
+                
+                if isinstance(item[key], list):
+                    for sub_item in item[key]:
+                        if isinstance(sub_item, dict) and "@id" in sub_item and "://" in sub_item["@id"]:
+                            sub_id = sub_item["@id"]
+
+        if "@type" in item:
+            for type_uri in item["@type"]:
+                if "://" in type_uri:
+                    uris_to_process.add(type_uri)
+
+    context_obj = LDContext()
+    
+    for uri in uris_to_process:
+        base_url = _get_namespace_base(uri)
+        
+        if base_url:
+            context_obj.add(base_url)
+
+    context_obj = context_obj + orig_context
+    return {"@context": context_obj.full_context}

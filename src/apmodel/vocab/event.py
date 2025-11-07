@@ -1,8 +1,8 @@
 from typing import Annotated, ClassVar, Literal, Optional, Union
 
-from pydantic import BeforeValidator, Field
+from pydantic import PlainSerializer, BeforeValidator, Field
 
-from apmodel.helpers import generate_aliases, get_value_from_array
+from apmodel.helpers import generate_aliases, get_value_from_array, to_jld
 from apmodel.types.aliases import OPT_FLOAT
 
 from ..core.object import Object
@@ -22,4 +22,4 @@ class Place(Object):
     radius: OPT_FLOAT = Field(default=None, **generate_aliases("radius", "as2"))
     units: Annotated[Optional[
         Union[str, Literal["cm", "feet", "inches", "km", "m", "miles"]]
-    ], BeforeValidator(get_value_from_array)] = Field(default=None, **generate_aliases("units", "as2"))
+    ], BeforeValidator(get_value_from_array), PlainSerializer(to_jld())] = Field(default=None, **generate_aliases("units", "as2"))
