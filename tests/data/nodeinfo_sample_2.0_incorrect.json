@@ -1,0 +1,33 @@
+
+{
+    "version": "2.0",
+    "software": {
+        "name": "foofedi",
+        "version": "2025.8.27",
+        "homepage": "https://foofedi.example.com/"
+    },
+    "protocols": [
+        "activitypub"
+    ],
+    "services": {
+        "inbound": [],
+        "outbound": [
+            "atom1.0",
+            "rss2.0"
+        ]
+    },
+    "openRegistrations": false,
+    "usage": {
+        "users": {
+            "total": 4,
+            "activeHalfyear": 2,
+            "activeMonth": 2
+        },
+        "localPosts": 696,
+        "localComments": 0
+    },
+    "metadata": {
+        "nodeName": "FooFedi TEST",
+        "nodeDescription": "TEST SERVER"
+    }
+}
