@@ -22,7 +22,8 @@ class DataIntegrityProof(ActivityPubModel):
             ]
         ),
         alias="@context",
-        kw_only=True,
+        kw_only=True, 
+        exclude=True
     )
     AS_URI: ClassVar[str] = "https://w3id.org/security#DataIntegrityProof"
 

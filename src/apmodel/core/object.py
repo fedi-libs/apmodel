@@ -36,7 +36,8 @@ class Object(ActivityPubModel):
         kw_only=True,
         default_factory=lambda: LDContext(
             ["https://www.w3.org/ns/activitystreams"]
-        ),
+        ), 
+        exclude=True
     )
     AS_URI = "https://www.w3.org/ns/activitystreams#Object"
 

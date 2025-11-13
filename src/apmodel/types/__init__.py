@@ -21,7 +21,7 @@ class ActivityPubModel(BaseModel):
     model_config = ConfigDict(serialize_by_alias=True, populate_by_name=True, extra="allow")
     AS_URI: ClassVar[str] = "__apmodel_base__"
 
-    context: JSONLD_CONTEXT = Field(alias="@context")
+    context: JSONLD_CONTEXT = Field(alias="@context", exclude=True)
     type: Annotated[Optional[str], PlainSerializer(to_jld(arr_str=True))] = (
         Field(alias="@type", default=None, kw_only=True, frozen=True)
     )
@@ -40,7 +40,9 @@ class ActivityPubModel(BaseModel):
     @classmethod
     def save_raw_data(cls, data: Any) -> Any:
         if isinstance(data, dict):
-            data["raw_data_internal_key"] = data.copy()
+            if data.get("__APMODEL_TOP_LEVEL__"):
+                del data["__APMODEL_TOP_LEVEL__"]
+                data["raw_data_internal_key"] = data.copy()
         return data
 
     @property
@@ -106,7 +108,7 @@ class ActivityPubModel(BaseModel):
             dict: exported model dict.
         """
         jld_array = []
-        d = self.model_dump(**kwargs, exclude_none=True, exclude_defaults=True)
+        d = self.model_dump(**kwargs, exclude_none=True, exclude_defaults=True, exclude={'context'})
         jld_array.append(d)
         if compact:
             a = generate_context_from_expanded(jld_array, self.context)

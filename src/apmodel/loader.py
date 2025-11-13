@@ -9,14 +9,16 @@ def get_avaliable_models():
 
 def load(data: dict):
     expanded = jsonld.expand(data)
-    
-    if expanded == []:
-        return data
-        
-    dict_type = expanded[0].get("@type")
 
-    if isinstance(dict_type, list):
-        dict_type = dict_type[0]
+    if not expanded:
+        return data
+
+    dict_type_val = expanded[0].get("@type")
+
+    if isinstance(dict_type_val, list):
+        dict_type = dict_type_val[0]
+    else:
+        dict_type = dict_type_val
 
     if not dict_type:
         return data
@@ -26,11 +28,11 @@ def load(data: dict):
     if not m:
         return data
 
-    loaded_data = m.model_validate(data)
-    if "type" in data and dict_type:
-        data_copy = data.copy()
-        del data_copy["type"]
-        loaded_data = m.model_validate(data_copy)
-    else:
-        loaded_data = m.model_validate(data)
+    data_for_validation = data.copy()
+    if "type" in data_for_validation and dict_type:
+        del data_for_validation["type"]
+
+    data_for_validation["__APMODEL_TOP_LEVEL__"] = True
+    loaded_data = m.model_validate(data_for_validation)
+
     return loaded_data
