@@ -76,7 +76,7 @@ def test_multikey_set_public_key_with_ed25519():
     multikey = Multikey(id="did:example:123#key-1", controller="did:example:123")
 
     # Set the public key
-    multikey.set_public_key = public_key
+    multikey.public_key = public_key
 
     # Check that the multibase representation was set
     assert multikey.public_key_multibase is not None
@@ -99,7 +99,7 @@ def test_multikey_set_public_key_with_rsa():
     multikey = Multikey(id="did:example:123#key-1", controller="did:example:123")
 
     # Set the public key
-    multikey.set_public_key = public_key
+    multikey.public_key = public_key
 
     # Check that the multibase representation was set
     assert multikey.public_key_multibase is not None
@@ -118,7 +118,7 @@ def test_multikey_set_public_key_with_private_key():
     multikey = Multikey(id="did:example:123#key-1", controller="did:example:123")
 
     # Set the public key using the private key (should extract the public key)
-    multikey.set_public_key = private_key
+    multikey.public_key = private_key
 
     # Check that the multibase representation was set
     assert multikey.public_key_multibase is not None
@@ -137,7 +137,7 @@ def test_multikey_set_private_key():
     multikey = Multikey(id="did:example:123#key-1", controller="did:example:123")
 
     # Set the private key
-    multikey.set_private_key = private_key
+    multikey.private_key = private_key
 
     # Check that the multibase representation was set
     assert multikey.secret_key_multibase is not None

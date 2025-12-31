@@ -45,7 +45,7 @@ class Multikey(ActivityPubModel):
         return self._private_key
 
     @public_key.setter
-    def set_public_key(
+    def public_key(
         self,
         key: ed25519.Ed25519PublicKey
         | rsa.RSAPublicKey
@@ -59,7 +59,7 @@ class Multikey(ActivityPubModel):
         self.public_key_multibase = _encode_public_key_as_multibase(key)
 
     @private_key.setter
-    def set_private_key(
+    def private_key(
         self, key: ed25519.Ed25519PrivateKey | rsa.RSAPrivateKey
     ) -> None:
         self.secret_key_multibase = _encode_private_key_as_multibase(key)

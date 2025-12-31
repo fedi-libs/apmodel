@@ -24,7 +24,7 @@ from .vocab.note import Note
 
 def to_dict(obj: ActivityPubModel, **options) -> dict:
     raw_data = obj.model_dump(
-        by_alias=True, exclude_none=True, exclude_unset=True, **options
+        by_alias=True, exclude_none=True, **options
     )
 
     master_context = LDContext()

@@ -7,6 +7,7 @@ from typing_extensions import Dict
 from ...core.activity import IntransitiveActivity
 from ...core.link import Link
 from ...core.object import Object
+from ...types import ZDateTime
 
 
 class Question(IntransitiveActivity):
@@ -14,7 +15,7 @@ class Question(IntransitiveActivity):
     one_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
     any_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
     closed: Optional[
-        str | Object | Link | Dict[str, Any] | datetime.datetime | bool
+        str | Object | Link | Dict[str, Any] | ZDateTime | bool
     ] = Field(default=None)
 
     @field_validator("one_of", mode="before")
@@ -50,9 +51,5 @@ class Question(IntransitiveActivity):
 
         return cast(Optional[str | Object | Link | Dict[str, Any]], load(v, "raw"))
 
-    @field_serializer("closed", when_used="always")
-    def serialize_closed(self, value: Any, _) -> str | bool | Any:
-        if isinstance(value, datetime.datetime):
-            return value.isoformat(timespec="seconds").replace("+00:00", "Z")
 
         return value

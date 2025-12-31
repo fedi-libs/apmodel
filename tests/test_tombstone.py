@@ -1,3 +1,4 @@
+import apmodel
 import pytest
 from datetime import datetime
 
@@ -118,7 +119,7 @@ def test_tombstone_serialization():
         deleted="2023-01-01T12:00:00Z",
     )
 
-    serialized = tombstone.model_dump(by_alias=True)
+    serialized = apmodel.to_dict(tombstone)
 
     assert serialized["id"] == "http://example.com/object/1"
     assert serialized["name"] == "Deleted Object"

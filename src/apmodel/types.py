@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional, TypeVar
+import datetime
+from typing import Annotated, Any, Dict, Optional, TypeVar
 
 from pydantic import (
     BaseModel,
@@ -7,10 +8,20 @@ from pydantic import (
     model_validator,
 )
 from pydantic.alias_generators import to_camel
+from pydantic.functional_serializers import PlainSerializer
+from typing_extensions import TypeAlias
 
 from .context import LDContext
 
 T = TypeVar("T", bound="ActivityPubModel")
+ZDateTime: TypeAlias = Annotated[
+    datetime.datetime,
+    PlainSerializer(
+        lambda v: (
+            v if v.tzinfo else v.replace(tzinfo=datetime.timezone.utc)
+        ).astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ").replace(".000000Z", "Z")
+    ),
+]
 
 
 class ActivityPubModel(BaseModel):
@@ -71,7 +82,9 @@ class ActivityPubModel(BaseModel):
 
                         if aggregated_context:
                             if hasattr(item, "context") and item.context:
-                                aggregated_context = aggregated_context + item.context
+                                aggregated_context = (
+                                    aggregated_context + item.context
+                                )
                             child_json.pop("@context", None)
                         processed_list.append(child_json)
                     else:
