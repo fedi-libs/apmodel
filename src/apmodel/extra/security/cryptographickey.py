@@ -35,7 +35,7 @@ class CryptographicKey(ActivityPubModel):
             )
 
     @public_key.setter
-    def set_public_key(self, k: rsa.RSAPublicKey | rsa.RSAPrivateKey) -> None:
+    def public_key(self, k: rsa.RSAPublicKey | rsa.RSAPrivateKey) -> None:
         if isinstance(k, rsa.RSAPrivateKey):
             k = k.public_key()
 
