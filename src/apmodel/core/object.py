@@ -60,7 +60,7 @@ class Object(ActivityPubModel):
     likes: Optional["Collection"] = Field(default=None)
     shares: Optional["Collection"] = Field(default=None)
     scope: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    tag: "List[Object | Hashtag | Emoji | Dict[str, Any]]" = Field(default_factory=list)
+    tag: "List[Object | Hashtag | Emoji | Link | Dict[str, Any]]" = Field(default_factory=list)
     attachment: "List[PropertyValue | Dict[str, Any] | Object | Link]" = Field(
         default_factory=list
     )
