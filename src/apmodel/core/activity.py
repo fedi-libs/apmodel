@@ -23,8 +23,8 @@ class Activity(Object):
         revalidate_instances="never",
     )
     type: str = Field(default="Activity", kw_only=True, frozen=True)
-    actor: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
-    object: Optional[str | Dict[str, Any] | Object] = Field(default=None)
+    actor: "str | Actor | List[str | Actor]" = Field()
+    object: str | Dict[str, Any] | Object = Field()
     target: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
     result: Optional[dict] = Field(default=None)
     origin: Optional[dict] = Field(default=None)
