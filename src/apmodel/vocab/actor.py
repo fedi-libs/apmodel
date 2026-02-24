@@ -21,7 +21,7 @@ class Actor(Object):
     Actors are entities that can perform activities.
     """
 
-    inbox: Optional[str | OrderedCollection] = Field(default=None)
+    inbox: str = Field()
     outbox: Optional[str | OrderedCollection] = Field(default=None)
     followers: Optional[str | OrderedCollection | Collection] = Field(default=None)
     following: Optional[str | OrderedCollection | Collection] = Field(default=None)
