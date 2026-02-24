@@ -10,7 +10,7 @@ from ...types import ActivityPubModel
 class CryptographicKey(ActivityPubModel):
     type: str = Field(default="CryptographicKey", kw_only=True, frozen=True)
 
-    id: Optional[str] = Field(default=None)
+    id: str = Field()
     owner: Optional[str] = Field(default=None)
     public_key_pem: Optional[str | bytes] = Field(default=None)
 

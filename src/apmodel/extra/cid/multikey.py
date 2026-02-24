@@ -1,5 +1,3 @@
-from typing import Optional
-
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 from pydantic import Field, PrivateAttr
 
