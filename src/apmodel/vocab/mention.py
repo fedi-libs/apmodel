@@ -6,4 +6,4 @@ from ..core.link import Link
 
 
 class Mention(Link):
-    type: Optional[str] = Field(default="Mention", kw_only=True, frozen=True)
+    type: str = Field(default="Mention", kw_only=True, frozen=True)

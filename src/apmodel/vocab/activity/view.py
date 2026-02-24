@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class View(Activity):
-    type: Optional[str] = Field(default="View", kw_only=True, frozen=True)
+    type: str = Field(default="View", kw_only=True, frozen=True)

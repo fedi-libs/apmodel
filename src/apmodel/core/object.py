@@ -27,7 +27,7 @@ class Object(ActivityPubModel):
         alias="@context",
     )
     id: Optional[str] = Field(default=None)
-    type: Optional[str] = Field(default="Object", kw_only=True, frozen=True)
+    type: str = Field(default="Object", kw_only=True, frozen=True)
     name: Optional[str] = Field(default=None)
     content: Optional[str] = Field(default=None)
     summary: Optional[str] = Field(default=None)

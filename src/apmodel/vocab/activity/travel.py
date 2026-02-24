@@ -6,4 +6,4 @@ from ...core.activity import IntransitiveActivity
 
 
 class Travel(IntransitiveActivity):
-    type: Optional[str] = Field(default="Travel", kw_only=True, frozen=True)
+    type: str = Field(default="Travel", kw_only=True, frozen=True)

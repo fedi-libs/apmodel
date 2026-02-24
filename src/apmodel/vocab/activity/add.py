@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Add(Activity):
-    type: Optional[str] = Field(default="Add", kw_only=True, frozen=True)
+    type: str = Field(default="Add", kw_only=True, frozen=True)

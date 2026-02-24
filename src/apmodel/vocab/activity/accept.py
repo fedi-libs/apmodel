@@ -6,8 +6,8 @@ from ...core.activity import Activity
 
 
 class Accept(Activity):
-    type: Optional[str] = Field(default="Accept", kw_only=True, frozen=True)
+    type: str = Field(default="Accept", kw_only=True, frozen=True)
 
 
 class TentativeAccept(Accept):
-    type: Optional[str] = Field(default="TentativeAccept", kw_only=True, frozen=True)
+    type: str = Field(default="TentativeAccept", kw_only=True, frozen=True)

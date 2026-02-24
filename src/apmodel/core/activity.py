@@ -22,7 +22,7 @@ class Activity(Object):
         extra="allow",
         revalidate_instances="never",
     )
-    type: Optional[str] = Field(default="Activity", kw_only=True, frozen=True)
+    type: str = Field(default="Activity", kw_only=True, frozen=True)
     actor: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
     object: Optional[str | Dict[str, Any] | Object] = Field(default=None)
     target: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
@@ -58,6 +58,6 @@ class Activity(Object):
 
 
 class IntransitiveActivity(Activity):
-    type: Optional[str] = Field(
+    type: str = Field(
         default="IntransitiveActivity", kw_only=True, frozen=True
     )

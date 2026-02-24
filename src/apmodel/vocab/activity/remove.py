@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Remove(Activity):
-    type: Optional[str] = Field(default="Remove", kw_only=True, frozen=True)
+    type: str = Field(default="Remove", kw_only=True, frozen=True)

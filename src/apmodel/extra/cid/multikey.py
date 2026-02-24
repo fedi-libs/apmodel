@@ -16,7 +16,7 @@ PrivateKeyTypes = str | ed25519.Ed25519PrivateKey | rsa.RSAPrivateKey
 
 
 class Multikey(ActivityPubModel):
-    type: Optional[str] = Field(default="Multikey", kw_only=True)
+    type: str = Field(default="Multikey", kw_only=True)
 
     id: str
     controller: str

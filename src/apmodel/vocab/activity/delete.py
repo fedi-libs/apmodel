@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Delete(Activity):
-    type: Optional[str] = Field(default="Delete", kw_only=True, frozen=True)
+    type: str = Field(default="Delete", kw_only=True, frozen=True)

@@ -6,4 +6,4 @@ from .ignore import Ignore
 
 
 class Block(Ignore):
-    type: Optional[str] = Field(default="Block", kw_only=True, frozen=True)
+    type: str = Field(default="Block", kw_only=True, frozen=True)

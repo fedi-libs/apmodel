@@ -17,7 +17,7 @@ class Link(ActivityPubModel):
         alias="@context",
     )
 
-    type: Optional[str] = Field(default="Link", kw_only=True, frozen=True)
+    type: str = Field(default="Link", kw_only=True, frozen=True)
     id: Optional["str | Link"] = Field(default=None, kw_only=True)
     name: Optional[str] = Field(default=None, kw_only=True)
     href: Optional[str] = Field(default=None)

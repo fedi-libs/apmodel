@@ -10,7 +10,7 @@ from .object import Object
 
 
 class Collection(Object):
-    type: Optional[str] = Field(default="Collection", kw_only=True)
+    type: str = Field(default="Collection", kw_only=True)
 
     total_items: Optional[int] = Field(default=None, ge=0)
     current: Optional[str | CollectionPage | OrderedCollectionPage | Link] = Field(
@@ -48,7 +48,7 @@ class Collection(Object):
 
 
 class CollectionPage(Collection):
-    type: Optional[str] = Field(default="CollectionPage", kw_only=True)
+    type: str = Field(default="CollectionPage", kw_only=True)
 
     part_of: Optional[str | Collection | Link] = Field(default=None)
 
@@ -57,7 +57,7 @@ class CollectionPage(Collection):
 
 
 class OrderedCollection(Collection):
-    type: Optional[str] = Field(default="OrderedCollection", kw_only=True)
+    type: str = Field(default="OrderedCollection", kw_only=True)
     ordered_items: Optional[List[Object | Link | Dict[str, Any] | str]] = Field(
         default=None
     )
@@ -75,6 +75,6 @@ class OrderedCollection(Collection):
 
 
 class OrderedCollectionPage(OrderedCollection, CollectionPage):
-    type: Optional[str] = Field(default="OrderedCollectionPage", kw_only=True)
+    type: str = Field(default="OrderedCollectionPage", kw_only=True)
 
     start_index: Optional[int] = Field(default=None, ge=0)

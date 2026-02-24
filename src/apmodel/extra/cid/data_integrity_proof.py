@@ -19,7 +19,7 @@ class DataIntegrityProof(ActivityPubModel):
         alias="@context",
     )
 
-    type: Optional[str] = Field(default="DataIntegrityProof", kw_only=True)
+    type: str = Field(default="DataIntegrityProof", kw_only=True)
     cryptosuite: str
     proof_value: str
     proof_purpose: str

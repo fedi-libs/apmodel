@@ -8,7 +8,7 @@ from ...types import ActivityPubModel
 
 
 class CryptographicKey(ActivityPubModel):
-    type: Optional[str] = Field(default="CryptographicKey", kw_only=True, frozen=True)
+    type: str = Field(default="CryptographicKey", kw_only=True, frozen=True)
 
     id: Optional[str] = Field(default=None)
     owner: Optional[str] = Field(default=None)

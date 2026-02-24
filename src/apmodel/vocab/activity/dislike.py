@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Dislike(Activity):
-    type: Optional[str] = Field(default="Dislike", kw_only=True, frozen=True)
+    type: str = Field(default="Dislike", kw_only=True, frozen=True)

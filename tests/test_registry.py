@@ -55,7 +55,7 @@ def test_register_custom_model(test_registry: ModelRegistry):
     """Tests registration of a new custom model."""
 
     class CustomObject(Object):
-        type: Optional[str] = Field("https://example.com/ns#CustomObject", frozen=True)
+        type: str = Field("https://example.com/ns#CustomObject", frozen=True)
 
     test_registry.register(CustomObject, "https://example.com/ns#CustomObject")
     retrieved_class = test_registry.get("https://example.com/ns#CustomObject")

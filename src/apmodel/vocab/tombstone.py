@@ -11,7 +11,7 @@ DeletedTypes = Optional[ZDateTime | str]
 
 
 class Tombstone(Object):
-    type: Optional[str] = Field(default="Tombstone", kw_only=True, frozen=True)
+    type: str = Field(default="Tombstone", kw_only=True, frozen=True)
     former_type: Optional[str | Object | Dict[str, Any]] = Field(default=None)
     deleted: Optional[ZDateTime | str] = Field(default=None)
 

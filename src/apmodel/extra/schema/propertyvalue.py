@@ -6,7 +6,7 @@ from ...types import ActivityPubModel
 
 
 class PropertyValue(ActivityPubModel):
-    type: Optional[str] = Field(default="PropertyValue", kw_only=True)
+    type: str = Field(default="PropertyValue", kw_only=True)
 
     name: Optional[str] = Field(default=None)
     value: Optional[str] = Field(default=None)

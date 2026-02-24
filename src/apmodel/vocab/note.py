@@ -6,4 +6,4 @@ from ..core.object import Object
 
 
 class Note(Object):
-    type: Optional[str] = Field(default="Note", kw_only=True, frozen=True)
+    type: str = Field(default="Note", kw_only=True, frozen=True)

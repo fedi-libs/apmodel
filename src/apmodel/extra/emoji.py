@@ -6,4 +6,4 @@ from ..core.object import Object
 
 
 class Emoji(Object):
-    type: Optional[str] = Field(default="Emoji", kw_only=True, frozen=True)
+    type: str = Field(default="Emoji", kw_only=True, frozen=True)

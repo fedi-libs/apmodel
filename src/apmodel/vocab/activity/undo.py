@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Undo(Activity):
-    type: Optional[str] = Field(default="Undo", kw_only=True, frozen=True)
+    type: str = Field(default="Undo", kw_only=True, frozen=True)

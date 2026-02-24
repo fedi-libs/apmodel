@@ -11,7 +11,7 @@ from ...types import ZDateTime
 
 
 class Question(IntransitiveActivity):
-    type: Optional[str] = Field(default="Question", kw_only=True, frozen=True)
+    type: str = Field(default="Question", kw_only=True, frozen=True)
     one_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
     any_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
     closed: Optional[

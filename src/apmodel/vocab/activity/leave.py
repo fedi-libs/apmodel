@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Leave(Activity):
-    type: Optional[str] = Field(default="Leave", kw_only=True, frozen=True)
+    type: str = Field(default="Leave", kw_only=True, frozen=True)

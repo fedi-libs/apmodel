@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Follow(Activity):
-    type: Optional[str] = Field(default="Follow", kw_only=True, frozen=True)
+    type: str = Field(default="Follow", kw_only=True, frozen=True)

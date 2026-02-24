@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Move(Activity):
-    type: Optional[str] = Field(default="Move", kw_only=True, frozen=True)
+    type: str = Field(default="Move", kw_only=True, frozen=True)

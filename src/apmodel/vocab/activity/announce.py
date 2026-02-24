@@ -6,4 +6,4 @@ from ...core.activity import Activity
 
 
 class Announce(Activity):
-    type: Optional[str] = Field(default="Announce", kw_only=True, frozen=True)
+    type: str = Field(default="Announce", kw_only=True, frozen=True)

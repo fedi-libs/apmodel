@@ -10,7 +10,7 @@ from ..extra.security import CryptographicKey
 
 
 class ActorEndpoints(Object):
-    type: Optional[str] = Field(default="as:Endpoints", kw_only=True, frozen=True)
+    type: str = Field(default="as:Endpoints", kw_only=True, frozen=True)
     shared_inbox: Optional[str | OrderedCollection] = Field(default=None)
 
 
@@ -110,20 +110,20 @@ class Actor(Object):
 
 
 class Application(Actor):
-    type: Optional[str] = Field(default="Application", kw_only=True, frozen=True)
+    type: str = Field(default="Application", kw_only=True, frozen=True)
 
 
 class Group(Actor):
-    type: Optional[str] = Field(default="Group", kw_only=True, frozen=True)
+    type: str = Field(default="Group", kw_only=True, frozen=True)
 
 
 class Organization(Actor):
-    type: Optional[str] = Field(default="Organization", kw_only=True, frozen=True)
+    type: str = Field(default="Organization", kw_only=True, frozen=True)
 
 
 class Person(Actor):
-    type: Optional[str] = Field(default="Person", kw_only=True, frozen=True)
+    type: str = Field(default="Person", kw_only=True, frozen=True)
 
 
 class Service(Actor):
-    type: Optional[str] = Field(default="Service", kw_only=True, frozen=True)
+    type: str = Field(default="Service", kw_only=True, frozen=True)
