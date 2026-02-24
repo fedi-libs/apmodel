@@ -1,3 +1,4 @@
+from typing import Generic
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
@@ -18,15 +19,15 @@ if TYPE_CHECKING:
     from .link import Link
 
 T = TypeVar("T", bound="Object")
+T_id = TypeVar("T_id", str, Optional[str])
 
-
-class Object(ActivityPubModel):
+class Object(ActivityPubModel, Generic[T_id]):
     context: LDContext = Field(
         default_factory=lambda: LDContext(["https://www.w3.org/ns/activitystreams"]),
         kw_only=True,
         alias="@context",
     )
-    id: Optional[str] = Field(default=None)
+    id: T_id = Field(default=None) # pyrefly: ignore[bad-assignment]
     type: str = Field(default="Object", kw_only=True, frozen=True)
     name: Optional[str] = Field(default=None)
     content: Optional[str] = Field(default=None)

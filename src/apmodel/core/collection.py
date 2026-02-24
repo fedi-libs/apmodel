@@ -9,7 +9,7 @@ from .link import Link
 from .object import Object
 
 
-class Collection(Object):
+class Collection(Object[str | None]):
     type: str = Field(default="Collection", kw_only=True)
 
     total_items: Optional[int] = Field(default=None, ge=0)

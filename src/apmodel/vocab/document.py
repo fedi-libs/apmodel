@@ -5,7 +5,7 @@ from pydantic import Field
 from ..core.object import Object
 
 
-class Document(Object):
+class Document(Object[str | None]):
     type: str = Field(default="Document", kw_only=True, frozen=True)
 
 

@@ -9,18 +9,19 @@ from ..extra.cid import Multikey
 from ..extra.security import CryptographicKey
 
 
-class ActorEndpoints(Object):
+class ActorEndpoints(Object[str | None]):
     type: str = Field(default="as:Endpoints", kw_only=True, frozen=True)
     shared_inbox: Optional[str | OrderedCollection] = Field(default=None)
 
 
-class Actor(Object):
+class Actor(Object[str]):
     """
     Represents an ActivityStreams Actor.
 
     Actors are entities that can perform activities.
     """
 
+    id: str = Field()
     inbox: str = Field()
     outbox: Optional[str | OrderedCollection] = Field(default=None)
     followers: Optional[str | OrderedCollection | Collection] = Field(default=None)

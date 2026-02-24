@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ..vocab.actor import Actor
 
 
-class Activity(Object):
+class Activity(Object[str | None]):
     model_config = ConfigDict(
         alias_generator=to_camel,
         populate_by_name=True,

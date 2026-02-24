@@ -10,7 +10,7 @@ from ..types import ZDateTime
 DeletedTypes = Optional[ZDateTime | str]
 
 
-class Tombstone(Object):
+class Tombstone(Object[str | None]):
     type: str = Field(default="Tombstone", kw_only=True, frozen=True)
     former_type: Optional[str | Object | Dict[str, Any]] = Field(default=None)
     deleted: Optional[ZDateTime | str] = Field(default=None)
