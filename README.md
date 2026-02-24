@@ -8,6 +8,15 @@ apmodel is a Python library that provides model implementations for various dece
 
 It is designed to easily parse and handle JSON data from sources like Mastodon, Misskey, and other Fediverse software.
 
+this branch is experiment of migrate apmodel to msgspec from pydantic v2. you can use this branch as drop-in alternative but maybe have some imcompatibilities.
+
+If using uv, you can override apmodel as this code:
+
+```toml
+[tool.uv.overrides]
+"apmodel" = { git = "https://github.com/fedi-libs/apmodel.git", rev = "dev/msgspec" }
+```
+
 ## Features
 
 - **Automatic Model Resolution**: The `apmodel.load` function automatically deserializes a JSON object into the appropriate Python object by reading its `type` field. If no matching model is found, the original dictionary is returned.
