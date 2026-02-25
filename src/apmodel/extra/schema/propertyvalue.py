@@ -1,12 +1,10 @@
 from typing import Optional
 
-from pydantic import Field
-
 from ...types import ActivityPubModel
 
 
 class PropertyValue(ActivityPubModel):
-    type: Optional[str] = Field(default="PropertyValue", kw_only=True)
+    type: Optional[str] = "PropertyValue"
 
-    name: Optional[str] = Field(default=None)
-    value: Optional[str] = Field(default=None)
+    name: Optional[str] = None
+    value: Optional[str] = None

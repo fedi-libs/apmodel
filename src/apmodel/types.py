@@ -35,7 +35,7 @@ class BaseModel(msgspec.Struct, rename="camel", omit_defaults=True):
 
 class ActivityPubModel(BaseModel, dict=True):
     # We use dict=True to allow model_extra-like behavior and __dict__ access
-    
+
     @property
     def model_extra(self) -> Dict[str, Any]:
         if not hasattr(self, "_model_extra"):
