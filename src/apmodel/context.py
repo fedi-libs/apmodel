@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, TypeVar
+from typing import Any, Dict, List, TypeVar, Union
 
-from pydantic import BaseModel, Field, model_serializer, model_validator
+import msgspec
 
 LDContextType = TypeVar("LDContextType", bound="LDContext")
 
 
-class LDContext(BaseModel):
+class LDContext(msgspec.Struct):
     """
     Parses and manages a JSON-LD @context, ensuring uniqueness.
 
@@ -17,15 +17,15 @@ class LDContext(BaseModel):
     This provides a list-like interface to the full context.
     """
 
-    urls: List[str] = Field(default_factory=list)
-    definitions: Dict[str, Any] = Field(default_factory=dict)
+    urls: List[str] = msgspec.field(default_factory=list)
+    definitions: Dict[str, Any] = msgspec.field(default_factory=dict)
 
-    def __init__(self, context: Any = None, **data: Any):
+    @classmethod
+    def from_any(cls, context: Any) -> LDContext:
+        instance = cls()
         if context is not None:
-            super().__init__(**data)
-            self.add(context)
-        else:
-            super().__init__(**data)
+            instance.add(context)
+        return instance
 
     def add(self, context: Any) -> None:
         if context is None:
@@ -45,7 +45,7 @@ class LDContext(BaseModel):
             elif isinstance(item, LDContext):
                 self.add(item.full_context)
 
-    def remove(self, item: str | Dict[str, Any]) -> None:
+    def remove(self, item: Union[str, Dict[str, Any]]) -> None:
         if isinstance(item, str):
             if item in self.urls:
                 self.urls.remove(item)
@@ -54,29 +54,13 @@ class LDContext(BaseModel):
                 self.definitions.pop(key, None)
 
     @property
-    def full_context(self) -> List[str | Dict[str, Any]]:
-        result: List[str | Dict[str, Any]] = list(self.urls)
+    def full_context(self) -> List[Union[str, Dict[str, Any]]]:
+        result: List[Union[str, Dict[str, Any]]] = list(self.urls)
         if self.definitions:
             result.append(self.definitions)
         return result
 
-    @model_validator(mode="before")
-    @classmethod
-    def validate_input(cls, value: Any) -> Any:
-        if isinstance(value, cls):
-            return value
-
-        if isinstance(value, (str, list, dict)):
-            temp_instance = cls.model_construct()
-            temp_instance.add(value)
-            return {
-                "urls": temp_instance.urls,
-                "definitions": temp_instance.definitions,
-            }
-        return value
-
-    @model_serializer
-    def serialize_model(self) -> List[str | Dict[str, Any]]:
+    def __to_json__(self) -> Any:
         return self.full_context
 
     def __repr__(self) -> str:
@@ -88,8 +72,8 @@ class LDContext(BaseModel):
     def __getitem__(self, key: Any) -> Any:
         return self.full_context[key]
 
-    def __add__(self: LDContextType, other: LDContext) -> LDContextType:
-        new_instance = self.__class__(self.full_context)
+    def __add__(self: LDContextType, other: LDContext) -> LDContext:
+        new_instance = self.__class__.from_any(self.full_context)
         if isinstance(other, LDContext):
             new_instance.add(other.full_context)
         return new_instance

@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "cryptography>=45.0.6",
+    "msgspec>=0.20.0",
     "multiformats>=0.3.1.post4",
     "pydantic>=2.12.5",
     "pyld[aiohttp,requests]>=2.0.4",
