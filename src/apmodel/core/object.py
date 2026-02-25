@@ -1,7 +1,6 @@
-from typing import Generic
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, TypeVar
 
 from pydantic import Field, ValidationInfo, field_validator
 from typing_extensions import Dict
@@ -21,13 +20,16 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound="Object")
 T_id = TypeVar("T_id", str, Optional[str])
 
+
 class Object(ActivityPubModel, Generic[T_id]):
     context: LDContext = Field(
-        default_factory=lambda: LDContext(["https://www.w3.org/ns/activitystreams"]),
+        default_factory=lambda: LDContext(
+            ["https://www.w3.org/ns/activitystreams"]
+        ),
         kw_only=True,
         alias="@context",
     )
-    id: T_id = Field(default=None) # pyrefly: ignore[bad-assignment]
+    id: T_id = Field(default=None)  # pyrefly: ignore[bad-assignment]
     type: str = Field(default="Object", kw_only=True, frozen=True)
     name: Optional[str] = Field(default=None)
     content: Optional[str] = Field(default=None)
@@ -35,9 +37,11 @@ class Object(ActivityPubModel, Generic[T_id]):
     url: Optional["str | Link"] = Field(default=None)
     published: Optional[str] = Field(default=None)
     updated: Optional[str] = Field(default=None)
-    attributed_to: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
-    audience: Optional["str | Object | Dict[str, Any] | List[str | Object]"] = Field(
+    attributed_to: Optional["str | Actor | List[str | Actor]"] = Field(
         default=None
+    )
+    audience: Optional["str | Object | Dict[str, Any] | List[str | Object]"] = (
+        Field(default=None)
     )
     to: Optional[
         "str | Object | Dict[str, Any] | List[str | Object | Dict[str, Any]]"
@@ -61,7 +65,9 @@ class Object(ActivityPubModel, Generic[T_id]):
     likes: Optional["Collection"] = Field(default=None)
     shares: Optional["Collection"] = Field(default=None)
     scope: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    tag: "List[Object | Hashtag | Emoji | Link | Dict[str, Any]]" = Field(default_factory=list)
+    tag: "List[Object | Hashtag | Emoji | Link | Dict[str, Any]]" = Field(
+        default_factory=list
+    )
     attachment: "List[PropertyValue | Dict[str, Any] | Object | Link]" = Field(
         default_factory=list
     )
@@ -72,7 +78,9 @@ class Object(ActivityPubModel, Generic[T_id]):
 
         if v is None:
             return None
-        parent_context = info.context.get("ld_context") if info.context else None
+        parent_context = (
+            info.context.get("ld_context") if info.context else None
+        )
         return load(v, "raw", parent_context=parent_context)
 
     @field_validator(
@@ -114,11 +122,15 @@ class Object(ActivityPubModel, Generic[T_id]):
         if result.get("featured"):
             dynamic_context.add({**tootcontext, "featured": "toot:featured"})
         if result.get("featuredTags"):
-            dynamic_context.add({**tootcontext, "featuredTags": "toot:featuredTags"})
+            dynamic_context.add(
+                {**tootcontext, "featuredTags": "toot:featuredTags"}
+            )
         if result.get("indexable"):
             dynamic_context.add({**tootcontext, "indexable": "toot:indexable"})
         if result.get("discoverable"):
-            dynamic_context.add({**tootcontext, "discoverable": "toot:discoverable"})
+            dynamic_context.add(
+                {**tootcontext, "discoverable": "toot:discoverable"}
+            )
 
         if any(
             isinstance(item, dict) and item.get("type") == "PropertyValue"

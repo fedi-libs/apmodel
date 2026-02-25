@@ -37,7 +37,7 @@ from pydantic import Field
 from apmodel.registry import registry
 from apmodel.core import Object # Or a more specific base class
 
-class MyCustomObject(Object):
+class MyCustomObject(Object[str | None]):
     type: str = Field("https://example.com/ns#MyCustomObject", frozen=True)
     my_property: str
 
