@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, Union, Dict
 
-from pydantic import ConfigDict, Field, ValidationInfo, field_validator
-from pydantic.alias_generators import to_camel
-from typing_extensions import Dict
-
+import msgspec
 from .object import Object
 
 if TYPE_CHECKING:
@@ -15,36 +12,37 @@ if TYPE_CHECKING:
 
 
 class Activity(Object):
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
-        serialize_by_alias=True,
-        extra="allow",
-        revalidate_instances="never",
-    )
-    type: Optional[str] = Field(default="Activity", kw_only=True, frozen=True)
-    actor: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
-    object: Optional[str | Dict[str, Any] | Object] = Field(default=None)
-    target: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
-    result: Optional[dict] = Field(default=None)
-    origin: Optional[dict] = Field(default=None)
-    instrument: Optional[dict] = Field(default=None)
+    type: Optional[str] = msgspec.field(default="Activity")
+    actor: Optional[Union[str, Actor, List[Union[str, Actor]]]] = msgspec.field(default=None)
+    object: Optional[Union[str, Dict[str, Any], Object]] = msgspec.field(default=None)
+    target: Optional[Union[str, Actor, List[Union[str, Actor]]]] = msgspec.field(default=None)
+    result: Optional[dict] = msgspec.field(default=None)
+    origin: Optional[dict] = msgspec.field(default=None)
+    instrument: Optional[dict] = msgspec.field(default=None)
 
-    @field_validator("object", mode="before")
     @classmethod
-    def convert_models(cls, v: Any, info: ValidationInfo) -> Any:
-        from ..loader import load
+    def model_validate(cls: type[Activity], data: Any, context: Optional[Dict[str, Any]] = None) -> Activity:
+        if not isinstance(data, dict):
+            if isinstance(data, cls):
+                return data
+            raise ValueError(f"Expected dict, got {type(data)}")
 
-        if isinstance(v, Object):
-            return v
-        if isinstance(v, str):
-            return v
-        if isinstance(v, dict):
-            parent_context = info.data.get("context")
-            if "@context" not in v and parent_context:
-                v["@context"] = parent_context.full_context
-            return load(v, "raw")
-        return v
+        ld_context = context.get("ld_context") if context else None
+        
+        # Pre-process fields that need conversion
+        data_copy = data.copy()
+        # Inherit fields from Object and add Activity's specific fields
+        fields_to_validate = [
+            "url", "attributedTo", "audience", "to", "bto", "cc", "bcc",
+            "generator", "icon", "image", "inReplyTo", "location", "preview",
+            "replies", "likes", "shares", "scope", "tag", "attachment",
+            "actor", "object", "target"
+        ]
+        for field in fields_to_validate:
+            if field in data_copy:
+                data_copy[field] = cls._convert_field_to_model(data_copy[field], ld_context)
+        
+        return super(Object, cls).model_validate(data_copy, context=context)
 
     def accept(self, id: str, actor: "Actor") -> "Accept":
         from ..vocab.activity.accept import Accept
@@ -58,6 +56,4 @@ class Activity(Object):
 
 
 class IntransitiveActivity(Activity):
-    type: Optional[str] = Field(
-        default="IntransitiveActivity", kw_only=True, frozen=True
-    )
+    type: Optional[str] = msgspec.field(default="IntransitiveActivity")

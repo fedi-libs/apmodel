@@ -1,17 +1,9 @@
 from __future__ import annotations
 
-from typing import ClassVar, List, Literal, Optional
+from typing import ClassVar, List, Literal, Optional, Union, Any, Dict
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    SerializerFunctionWrapHandler,
-    model_serializer,
-    model_validator,
-)
-from pydantic.alias_generators import to_camel
-from typing_extensions import TypeAlias
+import msgspec
+from ..types import BaseModel
 
 NodeinfoProtocol: TypeAlias = Literal[
     "activitypub",
@@ -71,53 +63,33 @@ NodeinfoOutbound: TypeAlias = Literal[
 
 
 class NodeinfoServices(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, serialize_by_alias=True
-    )
-
-    inbound: List[NodeinfoInbound] = Field(kw_only=True)
-    outbound: List[NodeinfoOutbound] = Field(kw_only=True)
+    inbound: List[NodeinfoInbound]
+    outbound: List[NodeinfoOutbound]
 
 
 class NodeinfoUsageUsers(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, serialize_by_alias=True
-    )
-
-    total: Optional[int] = Field(default=None)
-    active_half_year: Optional[int] = Field(default=None)
-    active_month: Optional[int] = Field(default=None)
+    total: Optional[int] = msgspec.field(default=None)
+    active_half_year: Optional[int] = msgspec.field(default=None)
+    active_month: Optional[int] = msgspec.field(default=None)
 
 
 class NodeinfoUsage(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, serialize_by_alias=True
-    )
-
     users: NodeinfoUsageUsers
-    local_posts: Optional[int] = Field(default=None)
-    local_comments: Optional[int] = Field(default=None)
+    local_posts: Optional[int] = msgspec.field(default=None)
+    local_comments: Optional[int] = msgspec.field(default=None)
 
 
 class NodeinfoSoftware(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, serialize_by_alias=True
-    )
-
-    name: Optional[str] = Field(default=None, pattern=r"^[a-z0-9-]+$")
-    version: Optional[str] = Field(default=None)
-    repository: Optional[str] = Field(default=None)
-    homepage: Optional[str] = Field(default=None)
+    name: Optional[str] = msgspec.field(default=None)
+    version: Optional[str] = msgspec.field(default=None)
+    repository: Optional[str] = msgspec.field(default=None)
+    homepage: Optional[str] = msgspec.field(default=None)
 
 
 class Nodeinfo(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, populate_by_name=True, serialize_by_alias=True
-    )
-
     version: Literal["2.0", "2.1"]
     software: NodeinfoSoftware
-    protocols: List[NodeinfoProtocol | str]
+    protocols: List[Union[NodeinfoProtocol, str]]
     services: NodeinfoServices
     open_registrations: bool
     usage: NodeinfoUsage
@@ -138,23 +110,23 @@ class Nodeinfo(BaseModel):
         """
         Checks if the given dictionary data matches Nodeinfo detection criteria.
         """
+        # Note: data might have camelCase keys from JSON
         return all(key in data for key in cls._DETECTION_KEYS)
 
-    @model_serializer(mode="wrap")
-    def serialize(self, handler: SerializerFunctionWrapHandler) -> dict:
-        serialized = handler(self)
-        if serialized["version"] == "2.0":
-            if "repository" in serialized["software"]:
-                serialized["software"].pop("repository")
-            if "homepage" in serialized["software"]:
-                serialized["software"].pop("homepage")
-        return serialized
+    @classmethod
+    def model_validate(cls: type[Nodeinfo], data: Any) -> Nodeinfo:
+        instance = super().model_validate(data)
+        if instance.version == "2.0":
+            if instance.software.repository:
+                instance.software.repository = None
+            if instance.software.homepage:
+                instance.software.homepage = None
+        return instance
 
-    @model_validator(mode="after")
-    def validate_nodeinfo(self):
-        if self.version == "2.0":
-            if self.software.repository:
-                self.software.repository = None
-            if self.software.homepage:
-                self.software.homepage = None
-        return self
+    def model_dump(self, mode: str = "json", **kwargs) -> Dict[str, Any]:
+        data = super().model_dump(mode=mode, **kwargs)
+        if data.get("version") == "2.0":
+            if "software" in data:
+                data["software"].pop("repository", None)
+                data["software"].pop("homepage", None)
+        return data

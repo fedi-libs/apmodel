@@ -1,25 +1,19 @@
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Optional, Union
 
-from pydantic import Field
-
-from ..context import LDContext
+import msgspec
 from ..types import ActivityPubModel
-
-T = TypeVar("T", bound="Link")
 
 
 class Link(ActivityPubModel):
-    context: LDContext = Field(
-        default_factory=lambda: LDContext(["https://www.w3.org/ns/activitystreams"]),
-        kw_only=True,
-        alias="@context",
-    )
-
-    type: Optional[str] = Field(default="Link", kw_only=True, frozen=True)
-    id: Optional["str | Link"] = Field(default=None, kw_only=True)
-    name: Optional[str] = Field(default=None, kw_only=True)
-    href: Optional[str] = Field(default=None)
-    hreflang: Optional[str] = Field(default=None)
-    media_type: Optional[str] = Field(default=None)
+    type: Optional[str] = msgspec.field(default="Link")
+    id: Optional[str] = msgspec.field(default=None)
+    href: Optional[str] = msgspec.field(default=None)
+    rel: Optional[Union[str, list[str]]] = msgspec.field(default=None)
+    media_type: Optional[str] = msgspec.field(default=None)
+    name: Optional[str] = msgspec.field(default=None)
+    hreflang: Optional[str] = msgspec.field(default=None)
+    height: Optional[int] = msgspec.field(default=None)
+    width: Optional[int] = msgspec.field(default=None)
+    preview: Optional[Union[str, Link]] = msgspec.field(default=None)

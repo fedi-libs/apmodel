@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, List, Optional, TypeVar, Union, Dict
 
-from pydantic import Field, ValidationInfo, field_validator
-from typing_extensions import Dict
-
+import msgspec
 from ..context import LDContext
 from ..types import ActivityPubModel
 
@@ -21,84 +19,78 @@ T = TypeVar("T", bound="Object")
 
 
 class Object(ActivityPubModel):
-    context: LDContext = Field(
+    context: LDContext = msgspec.field(
         default_factory=lambda: LDContext(["https://www.w3.org/ns/activitystreams"]),
-        kw_only=True,
-        alias="@context",
+        name="@context",
     )
-    id: Optional[str] = Field(default=None)
-    type: Optional[str] = Field(default="Object", kw_only=True, frozen=True)
-    name: Optional[str] = Field(default=None)
-    content: Optional[str] = Field(default=None)
-    summary: Optional[str] = Field(default=None)
-    url: Optional["str | Link"] = Field(default=None)
-    published: Optional[str] = Field(default=None)
-    updated: Optional[str] = Field(default=None)
-    attributed_to: Optional["str | Actor | List[str | Actor]"] = Field(default=None)
-    audience: Optional["str | Object | Dict[str, Any] | List[str | Object]"] = Field(
+    id: Optional[str] = msgspec.field(default=None)
+    type: Optional[str] = msgspec.field(default="Object")
+    name: Optional[str] = msgspec.field(default=None)
+    content: Optional[str] = msgspec.field(default=None)
+    summary: Optional[str] = msgspec.field(default=None)
+    url: Optional[Union[str, Link]] = msgspec.field(default=None)
+    published: Optional[str] = msgspec.field(default=None)
+    updated: Optional[str] = msgspec.field(default=None)
+    attributed_to: Optional[Union[str, Actor, List[Union[str, Actor]]]] = msgspec.field(default=None)
+    audience: Optional[Union[str, Object, Dict[str, Any], List[Union[str, Object]]]] = msgspec.field(
         default=None
     )
     to: Optional[
-        "str | Object | Dict[str, Any] | List[str | Object | Dict[str, Any]]"
-    ] = Field(default=None)
+        Union[str, Object, Dict[str, Any], List[Union[str, Object, Dict[str, Any]]]]
+    ] = msgspec.field(default=None)
     bto: Optional[
-        "str | Object | Dict[str, Any] | List[str | Object | Dict[str, Any]]"
-    ] = Field(default=None)
+        Union[str, Object, Dict[str, Any], List[Union[str, Object, Dict[str, Any]]]]
+    ] = msgspec.field(default=None)
     cc: Optional[
-        "str | Object | Dict[str, Any] | List[str | Object | Dict[str, Any]]"
-    ] = Field(default=None)
+        Union[str, Object, Dict[str, Any], List[Union[str, Object, Dict[str, Any]]]]
+    ] = msgspec.field(default=None)
     bcc: Optional[
-        "str | Object | Dict[str, Any] | List[str | Object | Dict[str, Any]]"
-    ] = Field(default=None)
-    generator: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    icon: Optional["Image"] = Field(default=None)
-    image: Optional["Image"] = Field(default=None)
-    in_reply_to: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    location: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    preview: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    replies: Optional["Collection"] = Field(default=None)
-    likes: Optional["Collection"] = Field(default=None)
-    shares: Optional["Collection"] = Field(default=None)
-    scope: "Optional[Object | Dict[str, Any]]" = Field(default=None)
-    tag: "List[Object | Hashtag | Emoji | Link | Dict[str, Any]]" = Field(default_factory=list)
-    attachment: "List[PropertyValue | Dict[str, Any] | Object | Link]" = Field(
+        Union[str, Object, Dict[str, Any], List[Union[str, Object, Dict[str, Any]]]]
+    ] = msgspec.field(default=None)
+    generator: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
+    icon: Optional[Image] = msgspec.field(default=None)
+    image: Optional[Image] = msgspec.field(default=None)
+    in_reply_to: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
+    location: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
+    preview: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
+    replies: Optional[Collection] = msgspec.field(default=None)
+    likes: Optional[Collection] = msgspec.field(default=None)
+    shares: Optional[Collection] = msgspec.field(default=None)
+    scope: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
+    tag: List[Union[Object, Hashtag, Emoji, Link, Dict[str, Any]]] = msgspec.field(default_factory=list)
+    attachment: List[Union[PropertyValue, Dict[str, Any], Object, Link]] = msgspec.field(
         default_factory=list
     )
 
     @classmethod
-    def _convert_field_to_model(cls, v: Any, info: ValidationInfo) -> Any:
+    def _convert_field_to_model(cls, v: Any, ld_context: Any = None) -> Any:
         from ..loader import load
 
         if v is None:
             return None
-        parent_context = info.context.get("ld_context") if info.context else None
-        return load(v, "raw", parent_context=parent_context)
+        return load(v, "raw", parent_context=ld_context)
 
-    @field_validator(
-        "url",
-        "attributed_to",
-        "audience",
-        "to",
-        "bto",
-        "cc",
-        "bcc",
-        "generator",
-        "icon",
-        "image",
-        "in_reply_to",
-        "location",
-        "preview",
-        "replies",
-        "likes",
-        "shares",
-        "scope",
-        "tag",
-        "attachment",
-        mode="before",
-    )
     @classmethod
-    def validate_fields(cls, v: Any, info: ValidationInfo) -> Any:
-        return cls._convert_field_to_model(v, info)
+    def model_validate(cls: type[T], data: Any, context: Optional[Dict[str, Any]] = None) -> T:
+        if not isinstance(data, dict):
+            if isinstance(data, cls):
+                return data
+            raise ValueError(f"Expected dict, got {type(data)}")
+
+        ld_context = context.get("ld_context") if context else None
+        
+        # Pre-process fields that need conversion
+        data_copy = data.copy()
+        fields_to_validate = [
+            "url", "attributedTo", "audience", "to", "bto", "cc", "bcc",
+            "generator", "icon", "image", "inReplyTo", "location", "preview",
+            "replies", "likes", "shares", "scope", "tag", "attachment"
+        ]
+        for field in fields_to_validate:
+            if field in data_copy:
+                data_copy[field] = cls._convert_field_to_model(data_copy[field], ld_context)
+        
+        return super().model_validate(data_copy, context=context)
 
     def _inference_context(self, result: dict) -> Dict[str, Any]:
         res_ctx = result.get("@context", [])
@@ -131,13 +123,13 @@ class Object(ActivityPubModel):
                 }
             )
         if any(
-            isinstance(item, dict) and item.get("type") == "Emoji"
+            isinstance(item, (dict, ActivityPubModel)) and getattr(item, "type", None) == "Emoji"
             for item in result.get("tag", [])
         ):
             dynamic_context.add({**tootcontext, "Emoji": "toot:Emoji"})
 
         if any(
-            isinstance(item, dict) and item.get("type") == "Hashtag"
+            isinstance(item, (dict, ActivityPubModel)) and getattr(item, "type", None) == "Hashtag"
             for item in result.get("tag", [])
         ):
             dynamic_context.add(
