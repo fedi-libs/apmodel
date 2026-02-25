@@ -76,7 +76,7 @@ def _encode_public_key_as_multibase(
 
 
 def _encode_private_key_as_multibase(
-    k: ed25519.Ed25519PrivateKey | rsa.RSAPrivateKey
+    k: ed25519.Ed25519PrivateKey | rsa.RSAPrivateKey,
 ) -> str:
     if isinstance(k, rsa.RSAPrivateKey):
         wrapped = multicodec.wrap(

@@ -6,11 +6,11 @@ from ..core.object import Object
 
 
 class Event(Object):
-    type: Optional[str] = Field(default="Event", kw_only=True, frozen=True)
+    type: Optional[str] = "Event"
 
 
 class Place(Object):
-    type: Optional[str] = Field(default="Place", kw_only=True, frozen=True)
+    type: Optional[str] = "Place"
     accuracy: Optional[float] = Field(default=None)
     altitude: Optional[float] = Field(default=None)
     latitude: Optional[float] = Field(default=None)

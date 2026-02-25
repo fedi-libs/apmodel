@@ -1,7 +1,6 @@
-import datetime
 from typing import Any, Optional, cast
 
-from pydantic import Field, field_serializer, field_validator
+from pydantic import Field, field_validator
 from typing_extensions import Dict
 
 from ...core.activity import IntransitiveActivity
@@ -11,12 +10,12 @@ from ...types import ZDateTime
 
 
 class Question(IntransitiveActivity):
-    type: Optional[str] = Field(default="Question", kw_only=True, frozen=True)
+    type: Optional[str] = "Question"
     one_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
     any_of: Optional[str | Object | Link | Dict[str, Any]] = Field(default=None)
-    closed: Optional[
-        str | Object | Link | Dict[str, Any] | ZDateTime | bool
-    ] = Field(default=None)
+    closed: Optional[str | Object | Link | Dict[str, Any] | ZDateTime | bool] = Field(
+        default=None
+    )
 
     @field_validator("one_of", mode="before")
     @classmethod
@@ -50,6 +49,5 @@ class Question(IntransitiveActivity):
         from ...loader import load
 
         return cast(Optional[str | Object | Link | Dict[str, Any]], load(v, "raw"))
-
 
         return value

@@ -6,5 +6,5 @@ from ..core.object import Object
 
 
 class Profile(Object):
-    type: Optional[str] = Field(default="Profile", kw_only=True, frozen=True)
+    type: Optional[str] = "Profile"
     describes: Optional[Object] = Field(default=None)

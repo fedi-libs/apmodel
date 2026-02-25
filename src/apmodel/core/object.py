@@ -31,9 +31,11 @@ class Object(ActivityPubModel):
     url: Optional[Union[str, Link]] = msgspec.field(default=None)
     published: Optional[str] = msgspec.field(default=None)
     updated: Optional[str] = msgspec.field(default=None)
-    attributed_to: Optional[Union[str, Actor, List[Union[str, Actor]]]] = msgspec.field(default=None)
-    audience: Optional[Union[str, Object, Dict[str, Any], List[Union[str, Object]]]] = msgspec.field(
+    attributed_to: Optional[Union[str, Actor, List[Union[str, Actor]]]] = msgspec.field(
         default=None
+    )
+    audience: Optional[Union[str, Object, Dict[str, Any], List[Union[str, Object]]]] = (
+        msgspec.field(default=None)
     )
     to: Optional[
         Union[str, Object, Dict[str, Any], List[Union[str, Object, Dict[str, Any]]]]
@@ -57,9 +59,11 @@ class Object(ActivityPubModel):
     likes: Optional[Collection] = msgspec.field(default=None)
     shares: Optional[Collection] = msgspec.field(default=None)
     scope: Optional[Union[Object, Dict[str, Any]]] = msgspec.field(default=None)
-    tag: List[Union[Object, Hashtag, Emoji, Link, Dict[str, Any]]] = msgspec.field(default_factory=list)
-    attachment: List[Union[PropertyValue, Dict[str, Any], Object, Link]] = msgspec.field(
+    tag: List[Union[Object, Hashtag, Emoji, Link, Dict[str, Any]]] = msgspec.field(
         default_factory=list
+    )
+    attachment: List[Union[PropertyValue, Dict[str, Any], Object, Link]] = (
+        msgspec.field(default_factory=list)
     )
 
     @classmethod
@@ -71,25 +75,45 @@ class Object(ActivityPubModel):
         return load(v, "raw", parent_context=ld_context)
 
     @classmethod
-    def model_validate(cls: type[T], data: Any, context: Optional[Dict[str, Any]] = None) -> T:
+    def model_validate(
+        cls: type[T], data: Any, context: Optional[Dict[str, Any]] = None
+    ) -> T:
         if not isinstance(data, dict):
             if isinstance(data, cls):
                 return data
             raise ValueError(f"Expected dict, got {type(data)}")
 
         ld_context = context.get("ld_context") if context else None
-        
+
         # Pre-process fields that need conversion
         data_copy = data.copy()
         fields_to_validate = [
-            "url", "attributedTo", "audience", "to", "bto", "cc", "bcc",
-            "generator", "icon", "image", "inReplyTo", "location", "preview",
-            "replies", "likes", "shares", "scope", "tag", "attachment"
+            "url",
+            "attributedTo",
+            "audience",
+            "to",
+            "bto",
+            "cc",
+            "bcc",
+            "generator",
+            "icon",
+            "image",
+            "inReplyTo",
+            "location",
+            "preview",
+            "replies",
+            "likes",
+            "shares",
+            "scope",
+            "tag",
+            "attachment",
         ]
         for field in fields_to_validate:
             if field in data_copy:
-                data_copy[field] = cls._convert_field_to_model(data_copy[field], ld_context)
-        
+                data_copy[field] = cls._convert_field_to_model(
+                    data_copy[field], ld_context
+                )
+
         return super().model_validate(data_copy, context=context)
 
     def _inference_context(self, result: dict) -> Dict[str, Any]:
@@ -123,13 +147,15 @@ class Object(ActivityPubModel):
                 }
             )
         if any(
-            isinstance(item, (dict, ActivityPubModel)) and getattr(item, "type", None) == "Emoji"
+            isinstance(item, (dict, ActivityPubModel))
+            and getattr(item, "type", None) == "Emoji"
             for item in result.get("tag", [])
         ):
             dynamic_context.add({**tootcontext, "Emoji": "toot:Emoji"})
 
         if any(
-            isinstance(item, (dict, ActivityPubModel)) and getattr(item, "type", None) == "Hashtag"
+            isinstance(item, (dict, ActivityPubModel))
+            and getattr(item, "type", None) == "Hashtag"
             for item in result.get("tag", [])
         ):
             dynamic_context.add(

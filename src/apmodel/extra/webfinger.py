@@ -21,9 +21,7 @@ class Resource(NamedTuple):
 
         _raw = resource_str
         clean_str = (
-            resource_str[5:]
-            if resource_str.startswith("acct:")
-            else resource_str
+            resource_str[5:] if resource_str.startswith("acct:") else resource_str
         )
         match = re.match(r"^([^@]+)@([^@]+)$", clean_str)
         if not match:

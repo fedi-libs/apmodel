@@ -40,9 +40,9 @@ def get_schema(path: str) -> dict:
 def cached_loader(requests_loader: Callable[[str, dict], dict], url, options={}):
     if "headers" not in options:
         options["headers"] = {}
-    options["headers"][
-        "Accept"
-    ] = "application/ld+json;profile=http://www.w3.org/ns/json-ld#context, application/ld+json, application/json;q=0.5, text/html;q=0.8, application/xhtml+xml;q=0.8"
+    options["headers"]["Accept"] = (
+        "application/ld+json;profile=http://www.w3.org/ns/json-ld#context, application/ld+json, application/json;q=0.5, text/html;q=0.8, application/xhtml+xml;q=0.8"
+    )
     return requests_loader(url, options)
 
 

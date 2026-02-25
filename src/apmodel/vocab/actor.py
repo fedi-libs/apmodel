@@ -14,7 +14,9 @@ class ActorEndpoints(Object):
     shared_inbox: Optional[Union[str, OrderedCollection]] = msgspec.field(default=None)
 
     @classmethod
-    def model_validate(cls: type[ActorEndpoints], data: Any, context: Optional[Dict[str, Any]] = None) -> ActorEndpoints:
+    def model_validate(
+        cls: type[ActorEndpoints], data: Any, context: Optional[Dict[str, Any]] = None
+    ) -> ActorEndpoints:
         if not isinstance(data, dict):
             if isinstance(data, cls):
                 return data
@@ -23,15 +25,33 @@ class ActorEndpoints(Object):
         ld_context = context.get("ld_context") if context else None
         data_copy = data.copy()
         fields_to_validate = [
-            "url", "attributedTo", "audience", "to", "bto", "cc", "bcc",
-            "generator", "icon", "image", "inReplyTo", "location", "preview",
-            "replies", "likes", "shares", "scope", "tag", "attachment",
-            "sharedInbox"
+            "url",
+            "attributedTo",
+            "audience",
+            "to",
+            "bto",
+            "cc",
+            "bcc",
+            "generator",
+            "icon",
+            "image",
+            "inReplyTo",
+            "location",
+            "preview",
+            "replies",
+            "likes",
+            "shares",
+            "scope",
+            "tag",
+            "attachment",
+            "sharedInbox",
         ]
         for field in fields_to_validate:
             if field in data_copy:
-                data_copy[field] = cls._convert_field_to_model(data_copy[field], ld_context)
-        
+                data_copy[field] = cls._convert_field_to_model(
+                    data_copy[field], ld_context
+                )
+
         return super(Object, cls).model_validate(data_copy, context=context)
 
 
@@ -44,9 +64,15 @@ class Actor(Object):
 
     inbox: Optional[Union[str, OrderedCollection]] = msgspec.field(default=None)
     outbox: Optional[Union[str, OrderedCollection]] = msgspec.field(default=None)
-    followers: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(default=None)
-    following: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(default=None)
-    liked: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(default=None)
+    followers: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(
+        default=None
+    )
+    following: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(
+        default=None
+    )
+    liked: Optional[Union[str, OrderedCollection, Collection]] = msgspec.field(
+        default=None
+    )
     streams: Optional[Union[str, Collection]] = msgspec.field(default=None)
     preferred_username: Optional[str] = msgspec.field(default=None)
     endpoints: Optional[ActorEndpoints] = msgspec.field(default=None)
@@ -58,7 +84,9 @@ class Actor(Object):
     assertion_method: List[Multikey] = msgspec.field(default_factory=list)
 
     @classmethod
-    def model_validate(cls: type[Actor], data: Any, context: Optional[Dict[str, Any]] = None) -> Actor:
+    def model_validate(
+        cls: type[Actor], data: Any, context: Optional[Dict[str, Any]] = None
+    ) -> Actor:
         if not isinstance(data, dict):
             if isinstance(data, cls):
                 return data
@@ -67,16 +95,41 @@ class Actor(Object):
         ld_context = context.get("ld_context") if context else None
         data_copy = data.copy()
         fields_to_validate = [
-            "url", "attributedTo", "audience", "to", "bto", "cc", "bcc",
-            "generator", "icon", "image", "inReplyTo", "location", "preview",
-            "replies", "likes", "shares", "scope", "tag", "attachment",
-            "inbox", "outbox", "followers", "following", "liked", "streams",
-            "endpoints", "publicKey", "assertionMethod"
+            "url",
+            "attributedTo",
+            "audience",
+            "to",
+            "bto",
+            "cc",
+            "bcc",
+            "generator",
+            "icon",
+            "image",
+            "inReplyTo",
+            "location",
+            "preview",
+            "replies",
+            "likes",
+            "shares",
+            "scope",
+            "tag",
+            "attachment",
+            "inbox",
+            "outbox",
+            "followers",
+            "following",
+            "liked",
+            "streams",
+            "endpoints",
+            "publicKey",
+            "assertionMethod",
         ]
         for field in fields_to_validate:
             if field in data_copy:
-                data_copy[field] = cls._convert_field_to_model(data_copy[field], ld_context)
-        
+                data_copy[field] = cls._convert_field_to_model(
+                    data_copy[field], ld_context
+                )
+
         return super(Object, cls).model_validate(data_copy, context=context)
 
     @property
@@ -134,7 +187,8 @@ class Actor(Object):
             dynamic_context.add({**tootcontext, "memorial": "toot:memorial"})
 
         if any(
-            isinstance(item, (dict, msgspec.Struct)) and getattr(item, "type", None) == "PropertyValue"
+            isinstance(item, (dict, msgspec.Struct))
+            and getattr(item, "type", None) == "PropertyValue"
             for item in result.get("attachment", [])
         ):
             dynamic_context.add(

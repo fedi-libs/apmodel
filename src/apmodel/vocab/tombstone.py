@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Optional, cast
 
-from pydantic import Field, field_serializer, field_validator
+from pydantic import Field, field_validator
 from typing_extensions import Dict
 
 from ..core.object import Object
@@ -11,7 +11,7 @@ DeletedTypes = Optional[ZDateTime | str]
 
 
 class Tombstone(Object):
-    type: Optional[str] = Field(default="Tombstone", kw_only=True, frozen=True)
+    type: Optional[str] = "Tombstone"
     former_type: Optional[str | Object | Dict[str, Any]] = Field(default=None)
     deleted: Optional[ZDateTime | str] = Field(default=None)
 

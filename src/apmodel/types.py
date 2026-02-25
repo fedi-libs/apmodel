@@ -1,5 +1,5 @@
 import datetime
-from typing import Annotated, Any, Dict, Optional, TypeVar, List, Union
+from typing import Annotated, Any, Dict, Optional, TypeVar
 import msgspec
 from typing_extensions import TypeAlias
 
@@ -7,15 +7,24 @@ from .context import LDContext
 
 T = TypeVar("T", bound="ActivityPubModel")
 
+
 def _format_datetime(v: datetime.datetime) -> str:
     if v.tzinfo is None:
         v = v.replace(tzinfo=datetime.timezone.utc)
-    return v.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ").replace(".000000Z", "Z")
+    return (
+        v.astimezone(datetime.timezone.utc)
+        .strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        .replace(".000000Z", "Z")
+    )
+
 
 ZDateTime: TypeAlias = Annotated[
     datetime.datetime,
-    msgspec.field(name="dateTime") # This is just a placeholder, msgspec handles datetime
+    msgspec.field(
+        name="dateTime"
+    ),  # This is just a placeholder, msgspec handles datetime
 ]
+
 
 class BaseModel(msgspec.Struct, rename="camel", omit_defaults=True):
     @classmethod
@@ -33,6 +42,7 @@ class BaseModel(msgspec.Struct, rename="camel", omit_defaults=True):
             return msgspec.json.decode(encoded)
         return msgspec.to_builtins(self)
 
+
 class ActivityPubModel(BaseModel, dict=True):
     # We use dict=True to allow model_extra-like behavior and __dict__ access
 
@@ -47,7 +57,9 @@ class ActivityPubModel(BaseModel, dict=True):
             self.context = LDContext(self.context)
 
     @classmethod
-    def model_validate(cls: type[T], data: Any, context: Optional[Dict[str, Any]] = None) -> T:
+    def model_validate(
+        cls: type[T], data: Any, context: Optional[Dict[str, Any]] = None
+    ) -> T:
         if not isinstance(data, dict):
             if isinstance(data, cls):
                 return data
@@ -68,10 +80,10 @@ class ActivityPubModel(BaseModel, dict=True):
         try:
             instance = msgspec.convert(data, cls, strict=False)
             instance._model_extra = extra_data
-            
+
             if hasattr(instance, "__post_init__"):
                 instance.__post_init__()
-                
+
             return instance
         except Exception as e:
             raise ValueError(f"Validation failed for {cls.__name__}: {e}") from e
@@ -80,22 +92,22 @@ class ActivityPubModel(BaseModel, dict=True):
         # Mimic Pydantic's model_dump
         # mode="json" should return camelCase
         # mode="python" should return snake_case (Pydantic default)
-        
-        # Actually, apmodel uses model_dump(exclude_none=True) and expects camelCase 
+
+        # Actually, apmodel uses model_dump(exclude_none=True) and expects camelCase
         # because of serialize_by_alias=True in Pydantic config.
-        
+
         data = msgspec.to_builtins(self)
-        
+
         if mode == "json":
             # msgspec.to_builtins returns Python names by default.
             # To get renamed keys, we can use a trick:
             encoded = msgspec.json.encode(self)
             data = msgspec.json.decode(encoded)
-        
+
         # Merge model_extra
         if hasattr(self, "_model_extra"):
             data.update(self._model_extra)
-            
+
         return data
 
     def dump(self, **kwargs) -> dict:
@@ -118,7 +130,7 @@ class ActivityPubModel(BaseModel, dict=True):
 
             if field_name.startswith("_") or value is None:
                 continue
-                
+
             # Handle empty lists/dicts if needed? Pydantic was "not value"
             if not value and not isinstance(value, (bool, int, float)):
                 continue
@@ -141,9 +153,7 @@ class ActivityPubModel(BaseModel, dict=True):
 
                         if aggregated_context:
                             if hasattr(item, "context") and item.context:
-                                aggregated_context = (
-                                    aggregated_context + item.context
-                                )
+                                aggregated_context = aggregated_context + item.context
                             child_json.pop("@context", None)
                         processed_list.append(child_json)
                     else:
