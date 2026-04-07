@@ -96,7 +96,7 @@ class Link:
         return {"rel": self._rel, "type": self._type, "href": self._href}
 
 
-class WebfingerResult:
+class Result:
     __slots__ = ("_subject", "_links", "_type_map")
 
     def __init__(
