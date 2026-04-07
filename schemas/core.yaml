@@ -98,6 +98,7 @@ classes:
     extends: Object
     isCoreType: true
     mixins:
+      - ActivityMixin
     properties:
       actor:
         type: WrapAS2[Object] | str | None
